@@ -9,53 +9,67 @@ use Illuminate\Validation\ValidationException;
 
 class LoginController extends Controller
 {
-    // 1) Mostrar formulario de login
+    /**
+     * Show the login form.
+     */
     public function showLoginForm()
     {
         return view('auth.login');
     }
 
-    // 2) Procesar el intento de login
+    /**
+     * Handle a login request.
+     */
     public function login(Request $request)
     {
-        // Validar campos
+        // Validate the login data
         $credentials = $request->validate([
             'correo'   => 'required|email',
             'password' => 'required|string',
+        ], [
+            'correo.required'   => 'El correo es obligatorio.',
+            'correo.email'      => 'Debes introducir un correo válido.',
+            'password.required' => 'La contraseña es obligatoria.',
         ]);
 
-        // Intentar autenticar usando 'correo' + 'password'
+        // Attempt to log the user in
         if (Auth::attempt([
             'correo'   => $credentials['correo'],
             'password' => $credentials['password'],
         ], $request->filled('remember'))) {
-            // Regenera la sesión para evitar fijación de sesión
+            // Regenerate session to prevent fixation
             $request->session()->regenerate();
 
-            // Redirigir según el rol
+            // Redirect based on role
             $user = Auth::user();
-            if ($user->rol === 'agricultor') {
-                return redirect()->route('agricultor.dashboard');
+            switch ($user->rol) {
+                case 'agricultor':
+                    return redirect()->route('agricultor.dashboard');
+                case 'administrador':
+                    return redirect()->route('admin.dashboard');
+                default:
+                    // cliente
+                    return redirect()->route('cliente.home');
             }
-            if ($user->rol === 'administrador') {
-                return redirect()->route('admin.dashboard');
-            }
-            // Por defecto, cliente
-            return redirect()->route('tienda.index');
         }
 
-        // Falló la autenticación
+        // Authentication failed
         throw ValidationException::withMessages([
             'correo' => ['Las credenciales no coinciden con nuestros registros.'],
         ]);
     }
 
-    // 3) Logout
+    /**
+     * Log the user out.
+     */
     public function logout(Request $request)
     {
         Auth::logout();
+
+        // Invalidate and regenerate session token
         $request->session()->invalidate();
         $request->session()->regenerateToken();
+
         return redirect()->route('home');
     }
 }
