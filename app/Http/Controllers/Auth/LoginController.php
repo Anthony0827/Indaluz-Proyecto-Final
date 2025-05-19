@@ -10,7 +10,9 @@ use Illuminate\Validation\ValidationException;
 class LoginController extends Controller
 {
     /**
-     * Show the login form.
+     * Mostrar el formulario de inicio de sesión.
+     *
+     * @return \Illuminate\View\View
      */
     public function showLoginForm()
     {
@@ -18,11 +20,16 @@ class LoginController extends Controller
     }
 
     /**
-     * Handle a login request.
+     * Procesar el intento de inicio de sesión.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\RedirectResponse
+     *
+     * @throws \Illuminate\Validation\ValidationException
      */
     public function login(Request $request)
     {
-        // Validate the login data
+        // Validar los datos de entrada
         $credentials = $request->validate([
             'correo'   => 'required|email',
             'password' => 'required|string',
@@ -32,44 +39,60 @@ class LoginController extends Controller
             'password.required' => 'La contraseña es obligatoria.',
         ]);
 
-        // Attempt to log the user in
+        // Intentar autenticar al usuario
         if (Auth::attempt([
             'correo'   => $credentials['correo'],
             'password' => $credentials['password'],
         ], $request->filled('remember'))) {
-            // Regenerate session to prevent fixation
+
+            // Regenerar la sesión para evitar fijación de sesión
             $request->session()->regenerate();
 
-            // Redirect based on role
-            $user = Auth::user();
-            switch ($user->rol) {
-                case 'agricultor':
-                    return redirect()->route('agricultor.dashboard');
+            // Comprobar que el usuario haya verificado su correo
+            if (! Auth::user()->verificado) {
+                // Cerrar sesión inmediatamente
+                Auth::logout();
+
+                // Redirigir de nuevo al login con mensaje de error
+                return redirect()
+                    ->route('login')
+                    ->withErrors(['correo' => 'Debes verificar tu cuenta antes de iniciar sesión.']);
+            }
+
+            // Redirigir según el rol del usuario
+            switch (Auth::user()->rol) {
                 case 'administrador':
                     return redirect()->route('admin.dashboard');
+                case 'agricultor':
+                    return redirect()->route('agricultor.dashboard');
                 default:
                     // cliente
                     return redirect()->route('cliente.home');
             }
         }
 
-        // Authentication failed
+        // Si la autenticación falla, lanzar excepción con mensaje en español
         throw ValidationException::withMessages([
             'correo' => ['Las credenciales no coinciden con nuestros registros.'],
         ]);
     }
 
     /**
-     * Log the user out.
+     * Cerrar la sesión del usuario.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function logout(Request $request)
     {
+        // Cerrar sesión
         Auth::logout();
 
-        // Invalidate and regenerate session token
+        // Invalidar e regenerar token de sesión
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
+        // Redirigir al home
         return redirect()->route('home');
     }
 }

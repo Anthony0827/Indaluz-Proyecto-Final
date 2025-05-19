@@ -4,6 +4,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Auth\VerificationController;
+
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
@@ -31,7 +33,11 @@ Route::post('login', [LoginController::class, 'login'])
 Route::post('logout', [LoginController::class, 'logout'])
      ->name('logout');
 
-     // al final de routes/web.php
+
+// Verificación de correo
+Route::get('email/verify/{token}', [VerificationController::class, 'verify'])
+     ->name('verification.verify');
+
 
 // Dashboard Cliente
 Route::get('cliente/home', function () {
