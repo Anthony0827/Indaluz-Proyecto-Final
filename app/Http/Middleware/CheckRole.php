@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Auth;
 class CheckRole
 {
     /**
-     * Maneja la petición entrante.
+     * Maneja la petición entrantse.
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  \Closure  $next
