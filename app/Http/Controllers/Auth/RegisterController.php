@@ -47,17 +47,26 @@ class RegisterController extends Controller
      */
     public function register(Request $request, string $rol)
     {
-        // Validation rules
+        // Reglas base para todos los usuarios
         $rules = [
             'nombre'    => ['required', 'string', 'max:50', 'regex:/^[\pL\s]+$/u'],
             'apellido'  => ['required', 'string', 'max:50', 'regex:/^[\pL\s]+$/u'],
             'correo'    => ['required', 'email', 'unique:usuarios,correo'],
             'password'  => ['required', 'string', 'min:8', 'confirmed'],
-            'direccion' => ['nullable', 'string', 'max:255'],
-            'telefono'  => ['nullable', 'regex:/^[0-9]+$/', 'max:20'],
         ];
 
-        // Custom error messages (Spanish)
+        // Reglas específicas según el rol
+        if ($rol === 'agricultor') {
+            // Para agricultores, dirección y teléfono son obligatorios
+            $rules['direccion'] = ['required', 'string', 'max:255'];
+            $rules['telefono']  = ['required', 'regex:/^[0-9]+$/', 'min:9', 'max:20'];
+        } else {
+            // Para clientes, son opcionales
+            $rules['direccion'] = ['nullable', 'string', 'max:255'];
+            $rules['telefono']  = ['nullable', 'regex:/^[0-9]+$/', 'max:20'];
+        }
+
+        // Mensajes de error personalizados
         $messages = [
             'nombre.required'    => 'El nombre es obligatorio.',
             'nombre.regex'       => 'El nombre solo puede contener letras y espacios.',
@@ -75,16 +84,19 @@ class RegisterController extends Controller
             'password.min'       => 'La contraseña debe tener al menos 8 caracteres.',
             'password.confirmed' => 'La confirmación de la contraseña no coincide.',
 
+            'direccion.required' => 'La dirección es obligatoria para agricultores.',
             'direccion.max'      => 'La dirección no puede tener más de 255 caracteres.',
 
+            'telefono.required'  => 'El teléfono es obligatorio para agricultores.',
             'telefono.regex'     => 'El teléfono solo puede contener números.',
+            'telefono.min'       => 'El teléfono debe tener al menos 9 dígitos.',
             'telefono.max'       => 'El teléfono no puede tener más de 20 dígitos.',
         ];
 
-        // Perform validation
+        // Validar datos
         $data = $request->validate($rules, $messages);
 
-        // Create the user (without logging in)
+        // Crear el usuario (sin iniciar sesión)
         $user = Usuario::create([
             'nombre'     => $data['nombre'],
             'apellido'   => $data['apellido'],
@@ -95,19 +107,24 @@ class RegisterController extends Controller
             'telefono'   => $data['telefono']  ?? null,
         ]);
 
-        // Create a verification token
+        // Crear token de verificación
         $token = Str::random(64);
         Verificacion::create([
             'id_usuario' => $user->id_usuario,
             'token'      => $token,
         ]);
 
-        // Send verification email
+        // Enviar email de verificación
         Mail::to($user->correo)->send(new VerifyEmail($user, $token));
 
-        // Redirect to login with success message
+        // Mensaje específico según el rol
+        $successMessage = $rol === 'agricultor' 
+            ? '¡Registro exitoso! Revisa tu correo para verificar tu cuenta. Una vez verificada, podrás empezar a publicar tus productos.'
+            : '¡Registrado con éxito! Revisa tu correo y verifica tu cuenta.';
+
+        // Redirigir al login con mensaje de éxito
         return redirect()
             ->route('login')
-            ->with('success', '¡Registrado con éxito! Revisa tu correo y verifica tu cuenta.');
+            ->with('success', $successMessage);
     }
 }
