@@ -4,6 +4,19 @@
 @section('title', 'Registro Agricultor')
 
 @section('content')
+{{-- Mostrar mensajes de sesión --}}
+@if(session('success'))
+    <div class="max-w-md mx-auto mt-4 p-4 bg-green-100 border border-green-400 text-green-700 rounded">
+        {{ session('success') }}
+    </div>
+@endif
+
+@if(session('error'))
+    <div class="max-w-md mx-auto mt-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
+        {{ session('error') }}
+    </div>
+@endif
+
 <div class="max-w-md mx-auto my-12 bg-white p-8 rounded-lg shadow">
     <h2 class="text-2xl font-bold text-center mb-6 text-green-700">
         Registro como Agricultor
