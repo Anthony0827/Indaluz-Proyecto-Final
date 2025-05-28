@@ -74,9 +74,14 @@ Route::middleware(['auth'])->group(function () {
             return 'Reseñas de clientes - Por implementar';
         })->name('resenas.index');
         
-        Route::get('/perfil', function () {
-            return 'Mi perfil - Por implementar';
-        })->name('perfil.index');
+        // Gestión del perfil
+        Route::prefix('perfil')->name('perfil.')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Agricultor\PerfilController::class, 'index'])->name('index');
+            Route::patch('/public', [\App\Http\Controllers\Agricultor\PerfilController::class, 'updatePublic'])->name('updatePublic');
+            Route::patch('/private', [\App\Http\Controllers\Agricultor\PerfilController::class, 'updatePrivate'])->name('updatePrivate');
+            Route::patch('/password', [\App\Http\Controllers\Agricultor\PerfilController::class, 'updatePassword'])->name('updatePassword');
+            Route::get('/preview', [\App\Http\Controllers\Agricultor\PerfilController::class, 'preview'])->name('preview');
+        });
     });
 
     // Dashboard Administrador
