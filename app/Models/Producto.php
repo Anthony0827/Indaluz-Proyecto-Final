@@ -21,13 +21,31 @@ class Producto extends Model
         'tiempo_de_cosecha',
         'cantidad_inventario',
         'categoria',
+        'unidad_medida',
         'estado'
     ];
 
     protected $casts = [
         'precio' => 'decimal:2',
-        'cantidad_inventario' => 'integer',
+        'cantidad_inventario' => 'decimal:2',
     ];
+
+    /**
+     * Obtiene el texto de la unidad de medida
+     */
+    public function getUnidadMedidaTextoAttribute(): string
+    {
+        $unidades = [
+            'unidad' => 'unidad(es)',
+            'kilogramo' => 'kg',
+            'gramo' => 'g',
+            'manojo' => 'manojo(s)',
+            'docena' => 'docena(s)',
+            'caja' => 'caja(s)'
+        ];
+
+        return $unidades[$this->unidad_medida] ?? $this->unidad_medida;
+    }
 
     /**
      * Relación con el agricultor
