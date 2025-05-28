@@ -56,15 +56,12 @@ Route::middleware(['auth'])->group(function () {
     Route::middleware(['role:agricultor'])->prefix('agricultor')->name('agricultor.')->group(function () {
         Route::get('/dashboard', [AgricultorController::class, 'dashboard'])->name('dashboard');
         
+        // Gestión de productos
+        Route::resource('productos', \App\Http\Controllers\Agricultor\ProductosController::class);
+        Route::post('productos/{id}/reactivate', [\App\Http\Controllers\Agricultor\ProductosController::class, 'reactivate'])->name('productos.reactivate');
+        Route::patch('productos/{id}/stock', [\App\Http\Controllers\Agricultor\ProductosController::class, 'updateStock'])->name('productos.updateStock');
+        
         // Placeholders para futuras rutas
-        Route::get('/productos', function () {
-            return 'Gestión de productos - Por implementar';
-        })->name('productos.index');
-        
-        Route::get('/productos/crear', function () {
-            return 'Crear producto - Por implementar';
-        })->name('productos.create');
-        
         Route::get('/pedidos', function () {
             return 'Gestión de pedidos - Por implementar';
         })->name('pedidos.index');
