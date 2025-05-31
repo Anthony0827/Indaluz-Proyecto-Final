@@ -50,32 +50,50 @@ class PerfilController extends Controller
             'foto_portada.max' => 'La foto de portada no puede pesar más de 4MB.',
         ]);
 
+        // Crear el array de datos a actualizar
+        $dataToUpdate = [
+            'nombre_empresa' => $validated['nombre_empresa'] ?? null,
+            'descripcion_publica' => $validated['descripcion_publica'] ?? null,
+            'anos_experiencia' => $validated['anos_experiencia'] ?? null,
+            'certificaciones' => $validated['certificaciones'] ?? null,
+            'metodos_cultivo' => $validated['metodos_cultivo'] ?? null,
+            'horario_atencion' => $validated['horario_atencion'] ?? null,
+        ];
+
         // Procesar foto de perfil
         if ($request->hasFile('foto_perfil')) {
-            // Eliminar foto anterior si existe
-            if ($agricultor->foto_perfil) {
-                Storage::disk('public')->delete($agricultor->foto_perfil);
-            }
+            try {
+                // Eliminar foto anterior si existe
+                if ($agricultor->foto_perfil && Storage::disk('public')->exists($agricultor->foto_perfil)) {
+                    Storage::disk('public')->delete($agricultor->foto_perfil);
+                }
 
-            $foto = $request->file('foto_perfil');
-            $nombreFoto = 'perfil-' . $agricultor->id_usuario . '-' . time() . '.' . $foto->getClientOriginalExtension();
-            $validated['foto_perfil'] = $foto->storeAs('perfiles', $nombreFoto, 'public');
+                $foto = $request->file('foto_perfil');
+                $nombreFoto = 'perfil-' . $agricultor->id_usuario . '-' . time() . '.' . $foto->getClientOriginalExtension();
+                $dataToUpdate['foto_perfil'] = $foto->storeAs('perfiles', $nombreFoto, 'public');
+            } catch (\Exception $e) {
+                return back()->withErrors(['foto_perfil' => 'Error al subir la foto de perfil: ' . $e->getMessage()]);
+            }
         }
 
         // Procesar foto de portada
         if ($request->hasFile('foto_portada')) {
-            // Eliminar portada anterior si existe
-            if ($agricultor->foto_portada) {
-                Storage::disk('public')->delete($agricultor->foto_portada);
-            }
+            try {
+                // Eliminar portada anterior si existe
+                if ($agricultor->foto_portada && Storage::disk('public')->exists($agricultor->foto_portada)) {
+                    Storage::disk('public')->delete($agricultor->foto_portada);
+                }
 
-            $portada = $request->file('foto_portada');
-            $nombrePortada = 'portada-' . $agricultor->id_usuario . '-' . time() . '.' . $portada->getClientOriginalExtension();
-            $validated['foto_portada'] = $portada->storeAs('perfiles', $nombrePortada, 'public');
+                $portada = $request->file('foto_portada');
+                $nombrePortada = 'portada-' . $agricultor->id_usuario . '-' . time() . '.' . $portada->getClientOriginalExtension();
+                $dataToUpdate['foto_portada'] = $portada->storeAs('perfiles', $nombrePortada, 'public');
+            } catch (\Exception $e) {
+                return back()->withErrors(['foto_portada' => 'Error al subir la foto de portada: ' . $e->getMessage()]);
+            }
         }
 
         // Actualizar datos
-        $agricultor->update($validated);
+        $agricultor->update($dataToUpdate);
 
         return redirect()
             ->route('agricultor.perfil.index')
