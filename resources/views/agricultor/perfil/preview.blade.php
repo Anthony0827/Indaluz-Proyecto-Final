@@ -7,6 +7,8 @@
     <title>{{ $agricultor->nombre_empresa ?? $agricultor->nombre . ' ' . $agricultor->apellido }} - Indaluz</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <script src="https://unpkg.com/lucide@latest" defer></script>
+        <link rel="icon" href="{{ asset('images/logo-indaluz.png') }}" type="image/png" sizes="64x64">
+
 </head>
 <body class="bg-gray-50">
     {{-- Banner de preview --}}

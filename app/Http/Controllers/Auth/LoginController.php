@@ -95,4 +95,31 @@ class LoginController extends Controller
         // Redirigir al home
         return redirect()->route('home');
     }
+
+    
+
+    /**
+     * Este método se ejecuta justo después de que el usuario se autentique correctamente.
+     * Se usa para redirigir según rol.
+     */
+    protected function authenticated(Request $request, $user)
+    {
+        // Si es cliente, lo mandamos al catálogo/home de cliente
+        if ($user->hasRole('cliente')) {
+            return redirect()->route('cliente.catalogo');
+        }
+
+        // Si es agricultor, al dashboard de agricultor
+        if ($user->hasRole('agricultor')) {
+            return redirect()->route('agricultor.dashboard');
+        }
+
+        // Si es administrador, al dashboard de admin
+        if ($user->hasRole('administrador')) {
+            return redirect()->route('admin.dashboard');
+        }
+
+        // Si no coincide ningún rol, redirigir al home público
+        return redirect()->route('home');
+    }
 }
