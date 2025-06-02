@@ -65,13 +65,19 @@ Route::middleware(['auth'])->group(function () {
                   ->name('producto');
              
              // Perfil público de agricultor
+
+               // Carrito
+        Route::get('/carrito', [\App\Http\Controllers\Cliente\CarritoController::class, 'index'])->name('carrito');
+        Route::post('/carrito/validar', [\App\Http\Controllers\Cliente\CarritoController::class, 'validar'])->name('carrito.validar');
+        
              Route::get('/agricultor/{id}', [\App\Http\Controllers\Cliente\ClienteController::class, 'agricultor'])
                   ->name('agricultor');
 
-             // Placeholders para futuras secciones
-             Route::get('/carrito', function () {
-                 return 'Carrito - Por implementar';
-             })->name('carrito');
+             
+        // Placeholders para futuras rutas
+        Route::get('/checkout', function () {
+            return 'Checkout - Por implementar';
+        })->name('checkout');
 
              Route::get('/pedidos', function () {
                  return 'Mis pedidos - Por implementar';
