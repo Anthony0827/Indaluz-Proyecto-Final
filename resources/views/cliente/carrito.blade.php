@@ -75,19 +75,61 @@ document.addEventListener('DOMContentLoaded', function() {
         },
         
         loadFromStorage() {
-            this.items = JSON.parse(localStorage.getItem('carrito') || '[]');
+            try {
+                const stored = localStorage.getItem('carrito');
+                this.items = stored ? JSON.parse(stored) : [];
+                // Asegurar que items sea siempre un array
+                if (!Array.isArray(this.items)) {
+                    this.items = [];
+                }
+            } catch (e) {
+                console.error('Error loading cart:', e);
+                this.items = [];
+            }
         },
         
         saveToStorage() {
-            localStorage.setItem('carrito', JSON.stringify(this.items));
-            this.updateCartCount();
+            try {
+                localStorage.setItem('carrito', JSON.stringify(this.items));
+                this.updateCartCount();
+                // Actualizar también el dropdown del header si existe
+                this.updateHeaderCart();
+            } catch (e) {
+                console.error('Error saving cart:', e);
+            }
         },
         
         updateCartCount() {
-            const total = this.items.reduce((sum, item) => sum + item.cantidad, 0);
+            const total = this.items.reduce((sum, item) => sum + (item.cantidad || 0), 0);
             document.querySelectorAll('.cart-count').forEach(el => {
                 el.textContent = total;
             });
+        },
+        
+        updateHeaderCart() {
+            const cartItems = document.getElementById('cart-items');
+            if (cartItems) {
+                if (this.items.length === 0) {
+                    cartItems.innerHTML = '<p class="px-4 py-8 text-center text-gray-500">Tu carrito está vacío</p>';
+                } else {
+                    let html = '<div class="max-h-96 overflow-y-auto">';
+                    this.items.forEach(item => {
+                        html += `
+                            <div class="px-4 py-3 border-b hover:bg-gray-50">
+                                <div class="flex justify-between items-start">
+                                    <div class="flex-1">
+                                        <h4 class="font-medium text-sm">${item.nombre}</h4>
+                                        <p class="text-xs text-gray-600">${item.cantidad} x ${parseFloat(item.precio).toFixed(2)}€/${item.unidad || 'unidad'}</p>
+                                    </div>
+                                    <span class="font-semibold text-sm">${(item.cantidad * parseFloat(item.precio)).toFixed(2)}€</span>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    html += '</div>';
+                    cartItems.innerHTML = html;
+                }
+            }
         },
         
         async validarCarrito() {
@@ -102,6 +144,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     },
                     body: JSON.stringify({ items: this.items })
                 });
+                
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
                 
                 const data = await response.json();
                 
@@ -124,19 +170,29 @@ document.addEventListener('DOMContentLoaded', function() {
         },
         
         updateQuantity(id, cantidad) {
-            const item = this.items.find(i => i.id == id);
-            if (item) {
-                item.cantidad = Math.max(1, Math.min(cantidad, item.max));
+            const itemIndex = this.items.findIndex(i => i.id == id);
+            if (itemIndex !== -1) {
+                const item = this.items[itemIndex];
+                const newQuantity = Math.max(1, Math.min(cantidad, item.max || 99));
+                this.items[itemIndex].cantidad = newQuantity;
                 this.saveToStorage();
                 this.render();
             }
         },
         
         removeItem(id) {
-            this.items = this.items.filter(i => i.id != id);
-            this.saveToStorage();
-            this.render();
-            this.showNotification('Producto eliminado del carrito', 'success');
+            // Filtrar el item que queremos eliminar
+            const originalLength = this.items.length;
+            this.items = this.items.filter(item => item.id != id);
+            
+            // Verificar que realmente se eliminó
+            if (this.items.length < originalLength) {
+                this.saveToStorage();
+                this.render();
+                this.showNotification('Producto eliminado del carrito', 'success');
+            } else {
+                console.error('No se pudo eliminar el producto con id:', id);
+            }
         },
         
         clearCart() {
@@ -144,11 +200,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 this.items = [];
                 this.saveToStorage();
                 this.render();
+                this.showNotification('Carrito vaciado', 'success');
             }
         },
         
         calculateTotal() {
-            return this.items.reduce((sum, item) => sum + (item.precio * item.cantidad), 0);
+            return this.items.reduce((sum, item) => {
+                const precio = parseFloat(item.precio) || 0;
+                const cantidad = parseInt(item.cantidad) || 0;
+                return sum + (precio * cantidad);
+            }, 0);
         },
         
         render() {
@@ -156,6 +217,11 @@ document.addEventListener('DOMContentLoaded', function() {
             const resumen = document.getElementById('resumen-carrito');
             const total = document.getElementById('total-carrito');
             const btnPago = document.getElementById('proceder-pago');
+            
+            if (!container || !resumen || !total || !btnPago) {
+                console.error('Elementos del carrito no encontrados');
+                return;
+            }
             
             if (this.items.length === 0) {
                 container.innerHTML = `
@@ -175,73 +241,95 @@ document.addEventListener('DOMContentLoaded', function() {
                 btnPago.disabled = true;
             } else {
                 // Renderizar productos
-                container.innerHTML = `
+                let htmlProductos = `
                     <div class="p-6">
                         <div class="flex justify-between items-center mb-4">
                             <h2 class="text-lg font-semibold">Productos (${this.items.length})</h2>
-                            <button onclick="carritoManager.clearCart()" 
+                            <button onclick="window.carritoManager.clearCart()" 
                                     class="text-red-600 hover:text-red-700 text-sm">
                                 Vaciar carrito
                             </button>
                         </div>
                         <div class="space-y-4">
-                            ${this.items.map(item => `
-                                <div class="flex gap-4 p-4 border rounded-lg ${item.precio_cambio ? 'border-yellow-400 bg-yellow-50' : ''}">
-                                    <div class="w-24 h-24 bg-gray-200 rounded-lg overflow-hidden flex-shrink-0">
-                                        ${item.imagen 
-                                            ? `<img src="${item.imagen}" alt="${item.nombre}" class="w-full h-full object-cover">`
-                                            : '<div class="w-full h-full flex items-center justify-center text-gray-400"><i data-lucide="image-off" class="w-8 h-8"></i></div>'
-                                        }
-                                    </div>
-                                    <div class="flex-1">
-                                        <h3 class="font-semibold text-gray-800">${item.nombre}</h3>
-                                        <p class="text-sm text-gray-600">Vendido por: ${item.agricultor}</p>
-                                        <div class="flex items-center gap-2 mt-2">
-                                            <span class="text-green-600 font-semibold">
-                                                ${item.precio.toFixed(2)}€/${item.unidad}
-                                            </span>
-                                            ${item.precio_cambio ? `
-                                                <span class="text-sm text-yellow-600">
-                                                    (Precio actualizado desde ${item.precio_original.toFixed(2)}€)
-                                                </span>
-                                            ` : ''}
-                                        </div>
-                                    </div>
-                                    <div class="flex items-center gap-2">
-                                        <div class="flex items-center border rounded-lg">
-                                            <button onclick="carritoManager.updateQuantity(${item.id}, ${item.cantidad - 1})"
-                                                    class="px-3 py-1 hover:bg-gray-100 ${item.cantidad <= 1 ? 'opacity-50 cursor-not-allowed' : ''}">
-                                                <i data-lucide="minus" class="w-4 h-4"></i>
-                                            </button>
-                                            <input type="number" 
-                                                   value="${item.cantidad}" 
-                                                   min="1" 
-                                                   max="${item.max}"
-                                                   onchange="carritoManager.updateQuantity(${item.id}, parseInt(this.value))"
-                                                   class="w-16 text-center border-0 focus:outline-none">
-                                            <button onclick="carritoManager.updateQuantity(${item.id}, ${item.cantidad + 1})"
-                                                    class="px-3 py-1 hover:bg-gray-100 ${item.cantidad >= item.max ? 'opacity-50 cursor-not-allowed' : ''}">
-                                                <i data-lucide="plus" class="w-4 h-4"></i>
-                                            </button>
-                                        </div>
-                                        <button onclick="carritoManager.removeItem(${item.id})"
-                                                class="p-2 text-red-600 hover:bg-red-50 rounded">
-                                            <i data-lucide="trash-2" class="w-5 h-5"></i>
-                                        </button>
-                                    </div>
+                `;
+                
+                this.items.forEach(item => {
+                    const precio = parseFloat(item.precio) || 0;
+                    const cantidad = parseInt(item.cantidad) || 1;
+                    const max = parseInt(item.max) || 99;
+                    
+                    htmlProductos += `
+                        <div class="flex gap-4 p-4 border rounded-lg ${item.precio_cambio ? 'border-yellow-400 bg-yellow-50' : ''}">
+                            <div class="w-24 h-24 bg-gray-200 rounded-lg overflow-hidden flex-shrink-0">
+                                ${item.imagen 
+                                    ? `<img src="${item.imagen}" alt="${item.nombre}" class="w-full h-full object-cover">`
+                                    : '<div class="w-full h-full flex items-center justify-center text-gray-400"><i data-lucide="image-off" class="w-8 h-8"></i></div>'
+                                }
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="font-semibold text-gray-800">${item.nombre}</h3>
+                                <p class="text-sm text-gray-600">Vendido por: ${item.agricultor || 'Agricultor'}</p>
+                                <div class="flex items-center gap-2 mt-2">
+                                    <span class="text-green-600 font-semibold">
+                                        ${precio.toFixed(2)}€/${item.unidad || 'unidad'}
+                                    </span>
+                                    ${item.precio_cambio ? `
+                                        <span class="text-sm text-yellow-600">
+                                            (Precio actualizado)
+                                        </span>
+                                    ` : ''}
                                 </div>
-                            `).join('')}
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <div class="flex items-center border rounded-lg">
+                                    <button onclick="window.carritoManager.updateQuantity('${item.id}', ${cantidad - 1})"
+                                            class="px-3 py-1 hover:bg-gray-100 ${cantidad <= 1 ? 'opacity-50 cursor-not-allowed' : ''}"
+                                            ${cantidad <= 1 ? 'disabled' : ''}>
+                                        <i data-lucide="minus" class="w-4 h-4"></i>
+                                    </button>
+                                    <input type="number" 
+                                           value="${cantidad}" 
+                                           min="1" 
+                                           max="${max}"
+                                           onchange="window.carritoManager.updateQuantity('${item.id}', parseInt(this.value))"
+                                           class="w-16 text-center border-0 focus:outline-none">
+                                    <button onclick="window.carritoManager.updateQuantity('${item.id}', ${cantidad + 1})"
+                                            class="px-3 py-1 hover:bg-gray-100 ${cantidad >= max ? 'opacity-50 cursor-not-allowed' : ''}"
+                                            ${cantidad >= max ? 'disabled' : ''}>
+                                        <i data-lucide="plus" class="w-4 h-4"></i>
+                                    </button>
+                                </div>
+                                <button onclick="window.carritoManager.removeItem('${item.id}')"
+                                        class="p-2 text-red-600 hover:bg-red-50 rounded">
+                                    <i data-lucide="trash-2" class="w-5 h-5"></i>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                htmlProductos += `
                         </div>
                     </div>
                 `;
                 
+                container.innerHTML = htmlProductos;
+                
                 // Renderizar resumen
-                resumen.innerHTML = this.items.map(item => `
-                    <div class="flex justify-between text-sm">
-                        <span class="text-gray-600">${item.nombre} x${item.cantidad}</span>
-                        <span class="font-medium">${(item.precio * item.cantidad).toFixed(2)}€</span>
-                    </div>
-                `).join('');
+                let htmlResumen = '';
+                this.items.forEach(item => {
+                    const precio = parseFloat(item.precio) || 0;
+                    const cantidad = parseInt(item.cantidad) || 1;
+                    const subtotal = precio * cantidad;
+                    
+                    htmlResumen += `
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-600">${item.nombre} x${cantidad}</span>
+                            <span class="font-medium">${subtotal.toFixed(2)}€</span>
+                        </div>
+                    `;
+                });
+                resumen.innerHTML = htmlResumen;
                 
                 // Actualizar total
                 const totalAmount = this.calculateTotal();
@@ -280,18 +368,24 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     };
     
+    // Hacer carritoManager global para poder acceder desde los onclick
+    window.carritoManager = carritoManager;
+    
     // Inicializar carrito
     carritoManager.init();
     
     // Botón proceder al pago
-    document.getElementById('proceder-pago').addEventListener('click', function() {
-        if (carritoManager.items.length > 0) {
-            // Por ahora solo mostramos un mensaje
-            alert('Funcionalidad de checkout próximamente');
-            // Cuando implementemos el checkout:
-            // window.location.href = '{{ route("cliente.checkout") }}';
-        }
-    });
+    const btnProcederPago = document.getElementById('proceder-pago');
+    if (btnProcederPago) {
+        btnProcederPago.addEventListener('click', function() {
+            if (carritoManager.items.length > 0) {
+                // Por ahora solo mostramos un mensaje
+                alert('Funcionalidad de checkout próximamente');
+                // Cuando implementemos el checkout:
+                // window.location.href = '{{ route("cliente.checkout") }}';
+            }
+        });
+    }
 });
 </script>
 @endpush
