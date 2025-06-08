@@ -47,50 +47,58 @@ Route::get('email/verify/{token}', [VerificationController::class, 'verify'])
 Route::middleware(['auth'])->group(function () {
 
     // ========= Dashboard Cliente =========
-    Route::middleware(['role:cliente'])
-         ->prefix('cliente')
-         ->name('cliente.')
-         ->group(function () {
-             
-             // Alias "catalogo" que carga el home de cliente
-             Route::get('/catalogo', [\App\Http\Controllers\Cliente\ClienteController::class, 'home'])
-                  ->name('catalogo');
-             
-             // Ruta original "/cliente/home" (si se recibe algún enlace antiguo)
-             Route::get('/home', [\App\Http\Controllers\Cliente\ClienteController::class, 'home'])
-                  ->name('home');
+Route::middleware(['role:cliente'])
+     ->prefix('cliente')
+     ->name('cliente.')
+     ->group(function () {
+         
+         // Alias "catalogo" que carga el home de cliente
+         Route::get('/catalogo', [\App\Http\Controllers\Cliente\ClienteController::class, 'home'])
+              ->name('catalogo');
+         
+         // Ruta original "/cliente/home" (si se recibe algún enlace antiguo)
+         Route::get('/home', [\App\Http\Controllers\Cliente\ClienteController::class, 'home'])
+              ->name('home');
 
-             // Detalle de producto
-             Route::get('/producto/{id}', [\App\Http\Controllers\Cliente\ClienteController::class, 'producto'])
-                  ->name('producto');
-             
-             // Perfil público de agricultor
+         // Detalle de producto
+         Route::get('/producto/{id}', [\App\Http\Controllers\Cliente\ClienteController::class, 'producto'])
+              ->name('producto');
+         
+         // Perfil público de agricultor
+         Route::get('/agricultor/{id}', [\App\Http\Controllers\Cliente\ClienteController::class, 'agricultor'])
+              ->name('agricultor');
 
-               // Carrito
-        Route::get('/carrito', [\App\Http\Controllers\Cliente\CarritoController::class, 'index'])->name('carrito');
-        Route::post('/carrito/validar', [\App\Http\Controllers\Cliente\CarritoController::class, 'validar'])->name('carrito.validar');
-        
-             Route::get('/agricultor/{id}', [\App\Http\Controllers\Cliente\ClienteController::class, 'agricultor'])
-                  ->name('agricultor');
+         // Carrito de compras
+         Route::get('/carrito', [\App\Http\Controllers\Cliente\CarritoController::class, 'index'])
+              ->name('carrito');
+         Route::post('/carrito/validar', [\App\Http\Controllers\Cliente\CarritoController::class, 'validar'])
+              ->name('carrito.validar');
 
-             
-        // Placeholders para futuras rutas
-        Route::get('/checkout', function () {
-            return 'Checkout - Por implementar';
-        })->name('checkout');
+         // Gestión del perfil del cliente - Ruta principal
+         Route::get('/perfil', [\App\Http\Controllers\Cliente\PerfilController::class, 'index'])
+              ->name('perfil');
+         
+         // Rutas adicionales del perfil
+         Route::patch('/perfil/update', [\App\Http\Controllers\Cliente\PerfilController::class, 'update'])
+              ->name('perfil.update');
+         Route::patch('/perfil/avatar', [\App\Http\Controllers\Cliente\PerfilController::class, 'updateAvatar'])
+              ->name('perfil.updateAvatar');
+         Route::patch('/perfil/password', [\App\Http\Controllers\Cliente\PerfilController::class, 'updatePassword'])
+              ->name('perfil.updatePassword');
 
-             Route::get('/pedidos', function () {
-                 return 'Mis pedidos - Por implementar';
-             })->name('pedidos');
+         // Placeholders para futuras rutas
+         Route::get('/checkout', function () {
+             return 'Checkout - Por implementar';
+         })->name('checkout');
 
-             Route::get('/perfil', function () {
-                 return 'Mi perfil - Por implementar';
-             })->name('perfil');
+         Route::get('/pedidos', function () {
+             return 'Mis pedidos - Por implementar';
+         })->name('pedidos');
 
-             Route::get('/direcciones', function () {
-                 return 'Mis direcciones - Por implementar';
-             })->name('direcciones');
-         });
+         Route::get('/direcciones', function () {
+             return 'Mis direcciones - Por implementar';
+         })->name('direcciones');
+     });
 
 
     // ======== Dashboard Agricultor ========
@@ -103,7 +111,7 @@ Route::middleware(['auth'])->group(function () {
              Route::get('/dashboard', [AgricultorController::class, 'dashboard'])
                   ->name('dashboard');
 
-             // Gestión de productos (CRUD + reactivate + updateStock)
+             // Gestión de productos (CRUD + reactivar + actualizar stock)
              Route::resource('productos', \App\Http\Controllers\Agricultor\ProductosController::class);
              Route::post('productos/{id}/reactivate', [\App\Http\Controllers\Agricultor\ProductosController::class, 'reactivate'])
                   ->name('productos.reactivate');
