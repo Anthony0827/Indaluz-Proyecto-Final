@@ -6,6 +6,10 @@ use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\VerificationController;
 use App\Http\Controllers\Agricultor\AgricultorController;
+use App\Http\Controllers\Cliente\PedidoController;
+use App\Http\Controllers\Cliente\ResenaController;
+
+
 
 // Página pública
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -91,9 +95,19 @@ Route::middleware(['role:cliente'])
              return 'Checkout - Por implementar';
          })->name('checkout');
 
-         Route::get('/pedidos', function () {
-             return 'Mis pedidos - Por implementar';
-         })->name('pedidos');
+         Route::get('/pedidos', [PedidoController::class, 'index'])
+             ->name('pedidos');
+
+             // Guardar reseña
+         Route::post('/pedidos/{id}/reseña', [ResenaController::class, 'store'])
+              ->name('pedidos.reseña.store');
+
+         // Editar reseña
+         Route::put('/pedidos/{id}/reseña', [ResenaController::class, 'update'])
+              ->name('pedidos.reseña.update');
+       // Detalle de pedido
+        Route::get('/pedidos/{id}', [PedidoController::class, 'show'])
+             ->name('pedidos.show');
 
          Route::get('/direcciones', function () {
              return 'Mis direcciones - Por implementar';

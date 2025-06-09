@@ -141,8 +141,9 @@
             <nav class="px-4 py-2">
                 <a href="{{ route('cliente.home') }}" class="block py-2 text-gray-700 hover:text-green-600">Inicio</a>
                 <a href="{{ route('cliente.perfil') }}" class="block py-2 text-gray-700 hover:text-green-600">Mi Perfil</a>
-                <a href="{{ route('cliente.pedidos') }}" class="block py-2 text-gray-700 hover:text-green-600">Mis Pedidos</a>
-                <a href="{{ route('cliente.direcciones') }}" class="block py-2 text-gray-700 hover:text-green-600">Direcciones</a>
+                    <a href="{{ route('cliente.pedidos') }}" class="block py-2 text-gray-700 hover:text-green-600">
+                                Mis Pedidos
+                            </a>                <a href="{{ route('cliente.direcciones') }}" class="block py-2 text-gray-700 hover:text-green-600">Direcciones</a>
             </nav>
         </div>
     </header>
