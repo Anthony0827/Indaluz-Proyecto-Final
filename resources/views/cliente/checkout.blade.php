@@ -1,5 +1,5 @@
 {{-- resources/views/cliente/checkout.blade.php --}}
-@extends('layouts.cliente')
+@extends('layouts.check')
 
 @section('title', 'Finalizar Compra')
 
@@ -286,20 +286,72 @@
                             </div>
 
                             {{-- Fecha de expiración y CVV --}}
-                            <div class="grid grid-cols-3 gap-4">
-                                <div>
-                                    <label for="mes_expiracion" class="block text-sm font-medium text-gray-700 mb-2">
-                                        Mes <span class="text-red-500">*</span>
-                                    </label>
-                                    <select name="mes_expiracion" 
-                                            id="mes_expiracion"
-                                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-green-500 @error('cvv') border-red-500 @enderror">
-                                    @error('cvv')
-                                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                                    @enderror
-                                </div>
-                            </div>
-                        </div>
+<div class="grid grid-cols-3 gap-4">
+    {{-- Mes --}}
+    <div>
+        <label for="mes_expiracion" class="block text-sm font-medium text-gray-700 mb-2">
+            Mes <span class="text-red-500">*</span>
+        </label>
+        <select name="mes_expiracion" 
+                id="mes_expiracion"
+                required
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-green-500 @error('mes_expiracion') border-red-500 @enderror">
+            <option value="">Mes</option>
+            @for($m = 1; $m <= 12; $m++)
+                @php $mm = str_pad($m, 2, '0', STR_PAD_LEFT); @endphp
+                <option value="{{ $mm }}" {{ old('mes_expiracion') == $mm ? 'selected' : '' }}>
+                    {{ $mm }}
+                </option>
+            @endfor
+        </select>
+        @error('mes_expiracion')
+            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+        @enderror
+    </div>
+
+    {{-- Año --}}
+    <div>
+        <label for="anio_expiracion" class="block text-sm font-medium text-gray-700 mb-2">
+            Año <span class="text-red-500">*</span>
+        </label>
+        <select name="anio_expiracion" 
+                id="anio_expiracion"
+                required
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-green-500 @error('anio_expiracion') border-red-500 @enderror">
+            <option value="">Año</option>
+            @php
+                $currentYear = date('Y');
+            @endphp
+            @for($y = 0; $y < 10; $y++)
+                @php $year = $currentYear + $y; @endphp
+                <option value="{{ $year }}" {{ old('anio_expiracion') == $year ? 'selected' : '' }}>
+                    {{ $year }}
+                </option>
+            @endfor
+        </select>
+        @error('anio_expiracion')
+            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+        @enderror
+    </div>
+
+    {{-- CVV --}}
+    <div>
+        <label for="cvv" class="block text-sm font-medium text-gray-700 mb-2">
+            CVV <span class="text-red-500">*</span>
+        </label>
+        <input type="text" 
+               name="cvv" 
+               id="cvv"
+               maxlength="3"
+               placeholder="123"
+               required
+               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-green-500 @error('cvv') border-red-500 @enderror">
+        @error('cvv')
+            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+        @enderror
+    </div>
+</div>
+
 
                         {{-- Mensaje de seguridad --}}
                         <div class="bg-green-50 border border-green-200 rounded-lg p-4">

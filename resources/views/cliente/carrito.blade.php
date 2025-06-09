@@ -375,14 +375,32 @@ document.addEventListener('DOMContentLoaded', function() {
     carritoManager.init();
     
     // Botón proceder al pago
-    const btnProcederPago = document.getElementById('proceder-pago');
+        const btnProcederPago = document.getElementById('proceder-pago');
+
     if (btnProcederPago) {
-        btnProcederPago.addEventListener('click', function() {
+        btnProcederPago.addEventListener('click', function () {
             if (carritoManager.items.length > 0) {
-                // Por ahora solo mostramos un mensaje
-                alert('Funcionalidad de checkout próximamente');
-                // Cuando implementemos el checkout:
-                // window.location.href = '{{ route("cliente.checkout") }}';
+                // Validar carrito primero
+                fetch('{{ route("cliente.carrito.validar") }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({ items: carritoManager.items })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        window.location.href = '{{ route("cliente.checkout") }}';
+                    } else {
+                        alert('Algunos productos no están disponibles. Por favor revisa tu carrito.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error en la validación del carrito:', error);
+                    alert('Ha ocurrido un error al validar el carrito.');
+                });
             }
         });
     }
