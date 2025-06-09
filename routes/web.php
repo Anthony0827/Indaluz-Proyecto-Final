@@ -8,6 +8,8 @@ use App\Http\Controllers\Auth\VerificationController;
 use App\Http\Controllers\Agricultor\AgricultorController;
 use App\Http\Controllers\Cliente\PedidoController;
 use App\Http\Controllers\Cliente\ResenaController;
+use App\Http\Controllers\Agricultor\ResenasController;
+
 
 
 
@@ -170,9 +172,10 @@ Route::middleware(['role:cliente'])
                  return 'Estadísticas de ventas - Por implementar';
              })->name('ventas.index');
 
-             Route::get('/resenas', function () {
-                 return 'Reseñas de clientes - Por implementar';
-             })->name('resenas.index');
+             Route::get('/resenas', [ResenasController::class, 'index'])
+              ->name('resenas.index');
+
+
 
              // Gestión del perfil del agricultor (público, privado, contraseña, preview)
              Route::prefix('perfil')->name('perfil.')->group(function () {
