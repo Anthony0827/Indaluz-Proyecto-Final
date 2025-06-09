@@ -98,6 +98,35 @@ Route::middleware(['role:cliente'])
          Route::get('/direcciones', function () {
              return 'Mis direcciones - Por implementar';
          })->name('direcciones');
+
+
+          // Gestión del perfil del cliente - Ruta principal
+          Route::get('/perfil', [\App\Http\Controllers\Cliente\PerfilController::class, 'index'])
+               ->name('perfil');
+
+          // Rutas adicionales del perfil
+          Route::patch('/perfil/update', [\App\Http\Controllers\Cliente\PerfilController::class, 'update'])
+               ->name('perfil.update');
+          Route::patch('/perfil/avatar', [\App\Http\Controllers\Cliente\PerfilController::class, 'updateAvatar'])
+               ->name('perfil.updateAvatar');
+          Route::patch('/perfil/password', [\App\Http\Controllers\Cliente\PerfilController::class, 'updatePassword'])
+               ->name('perfil.updatePassword');
+
+          // Proceso de checkout
+          Route::get('/checkout', [\App\Http\Controllers\Cliente\CheckoutController::class, 'index'])
+               ->name('checkout');
+          Route::post('/checkout/procesar', [\App\Http\Controllers\Cliente\CheckoutController::class, 'procesar'])
+               ->name('checkout.procesar');
+          Route::get('/pedido/{id}/confirmacion', [\App\Http\Controllers\Cliente\CheckoutController::class, 'confirmacion'])
+               ->name('pedido.confirmacion');
+
+          // Actualizar carrito para usar sesiones
+          Route::post('/carrito/agregar', [\App\Http\Controllers\Cliente\CarritoController::class, 'agregar'])
+               ->name('carrito.agregar');
+          Route::post('/carrito/actualizar', [\App\Http\Controllers\Cliente\CarritoController::class, 'actualizar'])
+               ->name('carrito.actualizar');
+          Route::post('/carrito/eliminar', [\App\Http\Controllers\Cliente\CarritoController::class, 'eliminar'])
+               ->name('carrito.eliminar');
      });
 
 
