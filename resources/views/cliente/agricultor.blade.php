@@ -4,94 +4,130 @@
 @section('title', $agricultor->nombre_empresa ?? $agricultor->nombre . ' ' . $agricultor->apellido)
 
 @section('content')
-<div class="container mx-auto px-4 py-6 space-y-12">
+<main class="bg-gray-50">
 
-    {{-- Cabecera: portada + avatar --}}
-    <div class="relative bg-white shadow rounded-lg overflow-hidden">
+    {{-- Cabecera perfil --}}
+    <div class="bg-white shadow-sm">
         {{-- Portada --}}
-        @if($agricultor->foto_portada)
-            <img src="{{ asset('storage/' . $agricultor->foto_portada) }}"
-                 alt="Portada {{ $agricultor->nombre }}"
-                 class="w-full h-64 object-cover">
-        @else
-            <div class="w-full h-64 bg-green-100"></div>
-        @endif
-
-        {{-- Avatar --}}
-        <div class="absolute -bottom-16 left-8">
-            @if($agricultor->foto_perfil)
-                <img src="{{ asset('storage/' . $agricultor->foto_perfil) }}"
-                     alt="Avatar {{ $agricultor->nombre }}"
-                     class="w-32 h-32 rounded-full border-4 border-white object-cover">
+        <div class="h-64 bg-gray-200 relative overflow-hidden">
+            @if($agricultor->foto_portada)
+                <img src="{{ asset('storage/' . $agricultor->foto_portada) }}"
+                     alt="Portada {{ $agricultor->nombre }}"
+                     class="w-full h-full object-cover">
             @else
-                <div class="w-32 h-32 rounded-full bg-green-600 border-4 border-white
-                            text-white flex items-center justify-center text-4xl font-bold">
-                    {{ substr($agricultor->nombre, 0, 1) }}
-                </div>
+                <div class="w-full h-full bg-gradient-to-r from-green-400 to-green-600"></div>
             @endif
         </div>
-    </div>
-
-    {{-- Datos del agricultor --}}
-    <div class="mt-20 bg-white shadow rounded-lg p-6 space-y-4">
-        {{-- Nombre / Empresa --}}
-        <h1 class="text-3xl font-bold text-gray-800">
-            {{ $agricultor->nombre_empresa ?? $agricultor->nombre . ' ' . $agricultor->apellido }}
-        </h1>
-
-        {{-- Descripción pública --}}
-        @if($agricultor->descripcion_publica)
-            <p class="text-gray-600">{{ $agricultor->descripcion_publica }}</p>
-        @endif
-
-        {{-- Puntuación media --}}
-        <div class="flex items-center space-x-2">
-            <div class="flex">
-                @for($i = 1; $i <= 5; $i++)
-                    <i data-lucide="star"
-                       class="w-6 h-6 {{ $i <= floor($calificacionPromedio) ? 'text-yellow-500' : 'text-gray-300' }}"></i>
-                @endfor
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-16 pb-6 flex items-end">
+            {{-- Avatar --}}
+            <div class="flex-shrink-0">
+                @if($agricultor->foto_perfil)
+                    <img src="{{ asset('storage/' . $agricultor->foto_perfil) }}"
+                         alt="{{ $agricultor->nombre }}"
+                         class="w-32 h-32 sm:w-40 sm:h-40 rounded-full border-4 border-white object-cover">
+                @else
+                    <div class="w-32 h-32 sm:w-40 sm:h-40 rounded-full border-4 border-white bg-green-600
+                                flex items-center justify-center text-white text-4xl font-bold">
+                        {{ substr($agricultor->nombre,0,1) }}
+                    </div>
+                @endif
             </div>
-            <span class="text-gray-700">
-                {{ number_format($calificacionPromedio, 1) }} / 5 ({{ $totalReseñas }} reseñas)
-            </span>
-        </div>
-
-        {{-- Datos adicionales (experiencia, horario, etc.) --}}
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            @if($agricultor->anos_experiencia)
-                <div>
-                    <h3 class="font-semibold text-lg text-gray-800">Años de experiencia</h3>
-                    <p class="text-gray-600">{{ $agricultor->anos_experiencia }} años</p>
+            {{-- Nombre y datos --}}
+            <div class="ml-6">
+                <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 truncate">
+                    {{ $agricultor->nombre_empresa ?? $agricultor->nombre . ' ' . $agricultor->apellido }}
+                </h1>
+                <div class="mt-2 flex flex-wrap text-sm text-gray-500 space-x-4">
+                    @if($agricultor->municipio || $agricultor->provincia)
+                        <div class="flex items-center">
+                            <i data-lucide="map-pin" class="w-4 h-4 mr-1 text-gray-400"></i>
+                            {{ $agricultor->municipio ?? 'Almería' }}, {{ $agricultor->provincia ?? 'Almería' }}
+                        </div>
+                    @endif
+                    @if($agricultor->anos_experiencia)
+                        <div class="flex items-center">
+                            <i data-lucide="award" class="w-4 h-4 mr-1 text-gray-400"></i>
+                            {{ $agricultor->anos_experiencia }} años de experiencia
+                        </div>
+                    @endif
                 </div>
-            @endif
-            @if($agricultor->horario_atencion)
-                <div>
-                    <h3 class="font-semibold text-lg text-gray-800">Horario de atención</h3>
-                    <p class="text-gray-600">{{ $agricultor->horario_atencion }}</p>
-                </div>
-            @endif
-            @if($agricultor->certificaciones)
-                <div>
-                    <h3 class="font-semibold text-lg text-gray-800">Certificaciones</h3>
-                    <p class="text-gray-600">{{ $agricultor->certificaciones }}</p>
-                </div>
-            @endif
-            @if($agricultor->metodos_cultivo)
-                <div>
-                    <h3 class="font-semibold text-lg text-gray-800">Métodos de cultivo</h3>
-                    <p class="text-gray-600">{{ $agricultor->metodos_cultivo }}</p>
-                </div>
-            @endif
+            </div>
         </div>
     </div>
 
-    {{-- Productos del agricultor --}}
-    <section>
-        <h2 class="text-2xl font-bold text-gray-800 mb-4">
-            Productos de {{ $agricultor->nombre_empresa ?? $agricultor->nombre }}
-        </h2>
+    {{-- Estadísticas --}}
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
+        <div class="bg-white rounded-lg shadow p-6 grid grid-cols-3 divide-x divide-gray-200 text-center">
+            <div>
+                <p class="text-2xl font-bold text-gray-900">{{ $totalProductos }}</p>
+                <p class="text-sm text-gray-500">Productos</p>
+            </div>
+            <div>
+                <p class="text-2xl font-bold text-gray-900">{{ number_format($calificacionPromedio,1) }}</p>
+                <div class="flex justify-center items-center space-x-1">
+                    @for($i=1;$i<=5;$i++)
+                        <i data-lucide="star"
+                           class="w-5 h-5 {{ $i <= $calificacionPromedio ? 'text-yellow-400 fill-current' : 'text-gray-300' }}">
+                        </i>
+                    @endfor
+                </div>
+                <p class="text-sm text-gray-500">{{ $totalReseñas }} reseñas</p>
+            </div>
+            <div>
+                <p class="text-2xl font-bold text-gray-900">{{ $totalReseñas }}</p>
+                <p class="text-sm text-gray-500">Reseñas</p>
+            </div>
+        </div>
+    </div>
 
+    {{-- Sobre nosotros --}}
+    @if($agricultor->descripcion_publica)
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
+        <div class="bg-white rounded-lg shadow p-6">
+            <h2 class="text-xl font-semibold text-gray-900 mb-2">Sobre nosotros</h2>
+            <p class="text-gray-700 whitespace-pre-line">{{ $agricultor->descripcion_publica }}</p>
+        </div>
+    </div>
+    @endif
+
+    {{-- Métodos de cultivo y Certificaciones --}}
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+        @if($agricultor->metodos_cultivo)
+        <div class="bg-white rounded-lg shadow p-6">
+            <h3 class="text-lg font-medium text-gray-900 mb-2 flex items-center">
+                <i data-lucide="leaf" class="w-5 h-5 text-green-600 mr-2"></i>
+                Métodos de cultivo
+            </h3>
+            <p class="text-gray-700">{{ $agricultor->metodos_cultivo }}</p>
+        </div>
+        @endif
+        @if($agricultor->certificaciones)
+        <div class="bg-white rounded-lg shadow p-6">
+            <h3 class="text-lg font-medium text-gray-900 mb-2 flex items-center">
+                <i data-lucide="award" class="w-5 h-5 text-green-600 mr-2"></i>
+                Certificaciones
+            </h3>
+            <p class="text-gray-700">{{ $agricultor->certificaciones }}</p>
+        </div>
+        @endif
+    </div>
+
+    {{-- Horario de atención --}}
+    @if($agricultor->horario_atencion)
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
+        <div class="bg-green-50 rounded-lg p-6 flex items-start space-x-3">
+            <i data-lucide="clock" class="w-6 h-6 text-green-600 mt-1"></i>
+            <div>
+                <h3 class="text-lg font-medium text-gray-900 mb-1">Horario de atención</h3>
+                <p class="text-gray-700">{{ $agricultor->horario_atencion }}</p>
+            </div>
+        </div>
+    </div>
+    @endif
+
+    {{-- Productos --}}
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <h2 class="text-2xl font-bold text-gray-800 mb-4">Productos</h2>
         @if($productos->count())
             <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
                 @foreach($productos as $producto)
@@ -111,7 +147,7 @@
                             <div class="p-4">
                                 <h3 class="font-semibold text-lg text-gray-800">{{ $producto->nombre }}</h3>
                                 <p class="text-green-600 font-bold mt-2">
-                                    {{ number_format($producto->precio, 2) }}€ /
+                                    {{ number_format($producto->precio,2) }}€ /
                                     {{ ucfirst($producto->unidad_medida) }}
                                 </p>
                             </div>
@@ -119,27 +155,25 @@
                     </div>
                 @endforeach
             </div>
-
-            <div class="mt-6">
-                {{ $productos->links() }}
-            </div>
+            <div class="mt-6">{{ $productos->links() }}</div>
         @else
-            <p class="text-gray-600">Este agricultor no tiene productos activos en este momento.</p>
+            <p class="text-gray-600">No hay productos disponibles.</p>
         @endif
     </section>
 
-    {{-- Reseñas recientes (opcional) --}}
+    {{-- Reseñas recientes --}}
     @if(isset($reseñasRecientes) && $reseñasRecientes->count())
-        <section class="space-y-4">
-            <h2 class="text-2xl font-bold text-gray-800">Reseñas recientes</h2>
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <h2 class="text-2xl font-bold text-gray-800 mb-4">Reseñas recientes</h2>
+        <div class="space-y-6">
             @foreach($reseñasRecientes as $res)
-                <div class="bg-white shadow rounded-lg p-4">
-                    <div class="flex items-center justify-between mb-2">
-                        <span class="font-semibold">{{ $res->cliente->nombre }}</span>
+                <div class="bg-white rounded-lg shadow p-4">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="font-semibold text-gray-800">{{ $res->cliente->nombre }}</span>
                         <span class="text-sm text-gray-500">{{ $res->fecha_reseña->format('d/m/Y H:i') }}</span>
                     </div>
                     <div class="flex items-center mb-2 space-x-1">
-                        @for($i = 1; $i <= 5; $i++)
+                        @for($i=1;$i<=5;$i++)
                             <i data-lucide="star"
                                class="w-5 h-5 {{ $i <= $res->rating ? 'text-yellow-500' : 'text-gray-300' }}"></i>
                         @endfor
@@ -149,8 +183,17 @@
                     @endif
                 </div>
             @endforeach
-        </section>
+        </div>
+    </section>
     @endif
 
-</div>
+</main>
 @endsection
+
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+    });
+</script>
+@endpush
