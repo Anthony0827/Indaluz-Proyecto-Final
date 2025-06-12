@@ -176,15 +176,35 @@
                     {{ $pedido->metodo_pago == 'tarjeta' ? 'Tarjeta de crédito/débito' : 'Efectivo' }}
                 </p>
             </div>
-            <div>
-                <p class="text-sm text-gray-600">Estado del pago</p>
-                <p class="font-medium {{ $pedido->estado_pago == 'pagado' ? 'text-green-600' : 'text-yellow-600' }}">
-                    {{ ucfirst($pedido->estado_pago) }}
-                    @if($pedido->metodo_pago == 'efectivo' && $pedido->estado_pago == 'pendiente')
-                        <span class="text-sm text-gray-500">(Se pagará al entregar)</span>
+                <div>
+                    <p class="text-sm text-gray-600">Estado del pago</p>
+                    @if($pedido->estado_pago == 'pagado')
+                        <p class="font-medium text-green-600">
+                            <i data-lucide="check-circle" class="w-4 h-4 inline mr-1"></i>
+                            Pagado
+                            @if($pedido->metodo_pago == 'efectivo')
+                                <span class="text-sm text-gray-500">(Efectivo recibido)</span>
+                            @endif
+                        </p>
+                    @elseif($pedido->metodo_pago == 'tarjeta')
+                        <p class="font-medium text-green-600">
+                            <i data-lucide="credit-card" class="w-4 h-4 inline mr-1"></i>
+                            Pagado con tarjeta
+                        </p>
+                    @elseif($pedido->estado == 'entregado')
+                        <p class="font-medium text-green-600">
+                            <i data-lucide="banknote" class="w-4 h-4 inline mr-1"></i>
+                            Pago completado
+                            <span class="text-sm text-gray-500">(Efectivo recibido)</span>
+                        </p>
+                    @else
+                        <p class="font-medium text-yellow-600">
+                            <i data-lucide="clock" class="w-4 h-4 inline mr-1"></i>
+                            Pendiente
+                            <span class="text-sm text-gray-500">(Se pagará al entregar)</span>
+                        </p>
                     @endif
-                </p>
-            </div>
+                </div>
             @if($pedido->numero_transaccion)
                 <div>
                     <p class="text-sm text-gray-600">Número de transacción</p>
