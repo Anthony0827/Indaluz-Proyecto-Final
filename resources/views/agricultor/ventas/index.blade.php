@@ -5,6 +5,7 @@
 @section('header', 'Análisis de Ventas')
 
 @section('content')
+
 <div class="space-y-6">
     {{-- Selector de período --}}
     <div class="bg-white rounded-lg shadow p-4">
@@ -42,11 +43,7 @@
                 Aplicar
             </button>
 
-            <button type="button" onclick="window.location.href='{{ route('agricultor.ventas.exportar') }}'" 
-                    class="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition">
-                <i data-lucide="download" class="w-4 h-4 inline mr-1"></i>
-                Exportar
-            </button>
+            
         </form>
     </div>
 
@@ -153,13 +150,17 @@
         {{-- Gráfico de ventas por período --}}
         <div class="bg-white rounded-lg shadow p-6">
             <h3 class="text-lg font-semibold text-gray-800 mb-4">Evolución de ventas</h3>
-            <canvas id="ventasPorPeriodoChart" height="300"></canvas>
+            <div class="relative h-64 w-full">
+                <canvas id="ventasPorPeriodoChart" class="w-full h-full"></canvas>
+            </div>
         </div>
 
         {{-- Distribución por categoría --}}
         <div class="bg-white rounded-lg shadow p-6">
             <h3 class="text-lg font-semibold text-gray-800 mb-4">Ventas por categoría</h3>
-            <canvas id="ventasPorCategoriaChart" height="300"></canvas>
+            <div class="relative h-64 w-full">
+                <canvas id="ventasPorCategoriaChart" class="w-full h-full"></canvas>
+            </div>
         </div>
     </div>
 
@@ -170,9 +171,9 @@
             <div class="p-6 border-b">
                 <h3 class="text-lg font-semibold text-gray-800">Productos más vendidos</h3>
             </div>
-            <div class="overflow-x-auto">
+            <div class="overflow-x-auto max-h-96">
                 <table class="w-full">
-                    <thead class="bg-gray-50">
+                    <thead class="bg-gray-50 sticky top-0">
                         <tr>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 Producto
@@ -196,6 +197,58 @@
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-center">
                                     <span class="text-sm text-gray-900">{{ $producto->cantidad_vendida }}</span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-right">
+                                    <span class="text-sm font-medium text-gray-900">{{ number_format($producto->ingresos, 2) }}€</span>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="3" class="px-6 py-4 text-center text-gray-500">
+                                    No hay datos de ventas en este período
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        {{-- Clientes frecuentes --}}
+        <div class="bg-white rounded-lg shadow">
+            <div class="p-6 border-b">
+                <h3 class="text-lg font-semibold text-gray-800">Mejores clientes</h3>
+            </div>
+            <div class="overflow-x-auto max-h-96">
+                <table class="w-full">
+                    <thead class="bg-gray-50 sticky top-0">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Cliente
+                            </th>
+                            <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Pedidos
+                            </th>
+                            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Total
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        @forelse($clientesFrecuentes as $cliente)
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div>
+                                        <div class="text-sm font-medium text-gray-900">
+                                            {{ $cliente->nombre }} {{ $cliente->apellido }}
+                                        </div>
+                                        <div class="text-xs text-gray-500">
+                                            Última compra: {{ \Carbon\Carbon::parse($cliente->ultima_compra)->format('d/m/Y') }}
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-center">
+                                    <span class="text-sm text-gray-900">{{ $cliente->numero_pedidos }}</span>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-right">
                                     <span class="text-sm font-medium text-gray-900">{{ number_format($cliente->total_comprado, 2) }}€</span>
@@ -256,111 +309,126 @@ document.addEventListener('DOMContentLoaded', function() {
     const ventasPorPeriodo = @json($ventasPorPeriodo);
     const ventasPorCategoria = @json($ventasPorCategoria);
 
-    // Gráfico de evolución de ventas
-    if (ventasPorPeriodo.length > 0) {
-        const ctx1 = document.getElementById('ventasPorPeriodoChart').getContext('2d');
-        new Chart(ctx1, {
-            type: 'line',
-            data: {
-                labels: ventasPorPeriodo.map(item => {
-                    const fecha = new Date(item.fecha);
-                    return fecha.toLocaleDateString('es-ES', { day: '2-digit', month: 'short' });
-                }),
-                datasets: [{
-                    label: 'Ventas (€)',
-                    data: ventasPorPeriodo.map(item => item.total),
-                    borderColor: 'rgb(34, 197, 94)',
-                    backgroundColor: 'rgba(34, 197, 94, 0.1)',
-                    tension: 0.1,
-                    fill: true
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        display: false
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                return 'Ventas: ' + context.parsed.y.toFixed(2) + '€';
-                            }
-                        }
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: {
-                            callback: function(value) {
-                                return value + '€';
-                            }
-                        }
-                    }
-                }
-            }
+    // Función para destruir gráficos existentes
+    function destroyExistingCharts() {
+        Chart.helpers.each(Chart.instances, function(instance) {
+            instance.destroy();
         });
     }
 
-    // Gráfico de ventas por categoría
-    if (ventasPorCategoria.length > 0) {
-        const ctx2 = document.getElementById('ventasPorCategoriaChart').getContext('2d');
-        new Chart(ctx2, {
-            type: 'doughnut',
-            data: {
-                labels: ventasPorCategoria.map(item => ucfirst(item.categoria)),
-                datasets: [{
-                    data: ventasPorCategoria.map(item => item.total),
-                    backgroundColor: [
-                        'rgba(34, 197, 94, 0.8)',
-                        'rgba(59, 130, 246, 0.8)',
-                        'rgba(251, 146, 60, 0.8)',
-                        'rgba(147, 51, 234, 0.8)'
-                    ],
-                    borderWidth: 0
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        position: 'bottom',
-                        labels: {
-                            padding: 20,
-                            usePointStyle: true,
-                            font: {
-                                size: 12
+    // Destruir gráficos existentes antes de crear nuevos
+    destroyExistingCharts();
+
+    // Gráfico de evolución de ventas
+    if (ventasPorPeriodo && ventasPorPeriodo.length > 0) {
+        const ctx1 = document.getElementById('ventasPorPeriodoChart');
+        if (ctx1) {
+            new Chart(ctx1, {
+                type: 'line',
+                data: {
+                    labels: ventasPorPeriodo.map(item => {
+                        const fecha = new Date(item.fecha);
+                        return fecha.toLocaleDateString('es-ES', { day: '2-digit', month: 'short' });
+                    }),
+                    datasets: [{
+                        label: 'Ventas (€)',
+                        data: ventasPorPeriodo.map(item => item.total),
+                        borderColor: 'rgb(34, 197, 94)',
+                        backgroundColor: 'rgba(34, 197, 94, 0.1)',
+                        tension: 0.1,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    aspectRatio: 2,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return 'Ventas: ' + context.parsed.y.toFixed(2) + '€';
+                                }
                             }
                         }
                     },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                const label = context.label || '';
-                                const value = context.parsed || 0;
-                                const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                                const percentage = ((value / total) * 100).toFixed(1);
-                                return label + ': ' + value.toFixed(2) + '€ (' + percentage + '%)';
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return value + '€';
+                                }
                             }
                         }
                     }
                 }
-            }
-        });
+            });
+        }
+    }
+
+    // Gráfico de ventas por categoría
+    if (ventasPorCategoria && ventasPorCategoria.length > 0) {
+        const ctx2 = document.getElementById('ventasPorCategoriaChart');
+        if (ctx2) {
+            new Chart(ctx2, {
+                type: 'doughnut',
+                data: {
+                    labels: ventasPorCategoria.map(item => ucfirst(item.categoria)),
+                    datasets: [{
+                        data: ventasPorCategoria.map(item => item.total),
+                        backgroundColor: [
+                            'rgba(34, 197, 94, 0.8)',
+                            'rgba(59, 130, 246, 0.8)',
+                            'rgba(251, 146, 60, 0.8)',
+                            'rgba(147, 51, 234, 0.8)',
+                            'rgba(236, 72, 153, 0.8)',
+                            'rgba(14, 165, 233, 0.8)'
+                        ],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    aspectRatio: 1.5,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                padding: 15,
+                                usePointStyle: true,
+                                font: {
+                                    size: 11
+                                }
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const label = context.label || '';
+                                    const value = context.parsed || 0;
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const percentage = ((value / total) * 100).toFixed(1);
+                                    return label + ': ' + value.toFixed(2) + '€ (' + percentage + '%)';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
     }
 
     // Función para capitalizar primera letra
     function ucfirst(str) {
+        if (!str) return '';
         return str.charAt(0).toUpperCase() + str.slice(1);
     }
 });
 </script>
 @endpush
-
-
 @endsection
-
-                                    

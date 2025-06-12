@@ -163,10 +163,18 @@ Route::middleware(['role:cliente'])
              Route::patch('productos/{id}/stock', [\App\Http\Controllers\Agricultor\ProductosController::class, 'updateStock'])
                   ->name('productos.updateStock');
 
-             // Secciones pendientes de implementar
-             Route::get('/pedidos', function () {
-                 return 'Gestión de pedidos - Por implementar';
-             })->name('pedidos.index');
+             Route::prefix('pedidos')->name('pedidos.')->group(function () {
+               Route::get('/', [\App\Http\Controllers\Agricultor\PedidosController::class, 'index'])
+                    ->name('index');
+               Route::get('/{id}', [\App\Http\Controllers\Agricultor\PedidosController::class, 'show'])
+                    ->name('show');
+               Route::patch('/{id}/estado', [\App\Http\Controllers\Agricultor\PedidosController::class, 'updateEstado'])
+                    ->name('updateEstado');
+               Route::post('/{id}/preparado', [\App\Http\Controllers\Agricultor\PedidosController::class, 'marcarPreparado'])
+                    ->name('marcarPreparado');
+               Route::get('/exportar', [\App\Http\Controllers\Agricultor\PedidosController::class, 'exportar'])
+                    ->name('exportar');
+               });
 
              Route::prefix('ventas')->name('ventas.')->group(function () {
                Route::get('/', [\App\Http\Controllers\Agricultor\VentasController::class, 'index'])
