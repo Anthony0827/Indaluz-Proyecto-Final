@@ -10,11 +10,17 @@ use App\Http\Controllers\Cliente\PedidoController;
 use App\Http\Controllers\Cliente\ResenaController;
 use App\Http\Controllers\Agricultor\ResenasController;
 
-
-
-
-// Página pública
+// Páginas públicas
 Route::get('/', [HomeController::class, 'index'])->name('home');
+
+// === NUEVAS RUTAS PARA LAS PÁGINAS ESTÁTICAS ===
+Route::get('/nosotros', [HomeController::class, 'nosotros'])->name('nosotros');
+Route::get('/sostenibilidad', [HomeController::class, 'sostenibilidad'])->name('sostenibilidad');
+Route::get('/agricultores', [HomeController::class, 'agricultores'])->name('agricultores');
+Route::get('/contacto', [HomeController::class, 'contacto'])->name('contacto');
+
+// Procesar formulario de contacto
+Route::post('/contacto', [HomeController::class, 'enviarContacto'])->name('contacto.enviar');
 
 // Rutas de autenticación (usuarios no logueados)
 Route::middleware('guest')->group(function () {

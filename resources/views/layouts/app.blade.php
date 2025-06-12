@@ -29,20 +29,13 @@
 
         <!-- Navegación escritorio -->
         <nav class="hidden md:flex items-center space-x-6">
-            <a href="#" class="hover:text-green-200">Inicio</a>
-            <a href="#" class="hover:text-green-200">Tienda</a>
-            <a href="#" class="hover:text-green-200">Nosotros</a>
-            <a href="#" class="hover:text-green-200">Sostenibilidad</a>
-            <a href="#" class="hover:text-green-200">Agricultores</a>
-            <a href="#" class="hover:text-green-200">Contacto</a>
+            <a href="{{ route('home') }}" class="hover:text-green-200 {{ request()->routeIs('home') ? 'text-green-200 border-b-2 border-green-200' : '' }}">Inicio</a>
+            <a href="{{ route('nosotros') }}" class="hover:text-green-200 {{ request()->routeIs('nosotros') ? 'text-green-200 border-b-2 border-green-200' : '' }}">Nosotros</a>
+            <a href="{{ route('sostenibilidad') }}" class="hover:text-green-200 {{ request()->routeIs('sostenibilidad') ? 'text-green-200 border-b-2 border-green-200' : '' }}">Sostenibilidad</a>
+            <a href="{{ route('agricultores') }}" class="hover:text-green-200 {{ request()->routeIs('agricultores') ? 'text-green-200 border-b-2 border-green-200' : '' }}">Agricultores</a>
+            <a href="{{ route('contacto') }}" class="hover:text-green-200 {{ request()->routeIs('contacto') ? 'text-green-200 border-b-2 border-green-200' : '' }}">Contacto</a>
 
-            <!-- Iconos búsqueda y carrito -->
-            <button class="p-2 hover:text-green-200">
-                <i data-lucide="search"></i>
-            </button>
-            <button class="p-2 hover:text-green-200">
-                <i data-lucide="shopping-cart"></i>
-            </button>
+            
 
             <!-- Usuario con dropdown -->
             <div class="relative" @click.away="userMenu = false">
@@ -89,12 +82,12 @@
     <div x-show="open" x-cloak @click.away="open = false"
          class="md:hidden bg-green-600 text-white z-40">
         <nav class="flex flex-col space-y-2 p-4">
-            <a href="#" class="hover:text-green-200">Inicio</a>
+            <a href="{{ route('home') }}" class="hover:text-green-200 {{ request()->routeIs('home') ? 'text-green-200 font-semibold' : '' }}">Inicio</a>
             <a href="#" class="hover:text-green-200">Tienda</a>
-            <a href="#" class="hover:text-green-200">Nosotros</a>
-            <a href="#" class="hover:text-green-200">Sostenibilidad</a>
-            <a href="#" class="hover:text-green-200">Agricultores</a>
-            <a href="#" class="hover:text-green-200">Contacto</a>
+            <a href="{{ route('nosotros') }}" class="hover:text-green-200 {{ request()->routeIs('nosotros') ? 'text-green-200 font-semibold' : '' }}">Nosotros</a>
+            <a href="{{ route('sostenibilidad') }}" class="hover:text-green-200 {{ request()->routeIs('sostenibilidad') ? 'text-green-200 font-semibold' : '' }}">Sostenibilidad</a>
+            <a href="{{ route('agricultores') }}" class="hover:text-green-200 {{ request()->routeIs('agricultores') ? 'text-green-200 font-semibold' : '' }}">Agricultores</a>
+            <a href="{{ route('contacto') }}" class="hover:text-green-200 {{ request()->routeIs('contacto') ? 'text-green-200 font-semibold' : '' }}">Contacto</a>
         </nav>
     </div>
 
