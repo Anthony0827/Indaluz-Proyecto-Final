@@ -168,9 +168,12 @@ Route::middleware(['role:cliente'])
                  return 'Gestión de pedidos - Por implementar';
              })->name('pedidos.index');
 
-             Route::get('/ventas', function () {
-                 return 'Estadísticas de ventas - Por implementar';
-             })->name('ventas.index');
+             Route::prefix('ventas')->name('ventas.')->group(function () {
+               Route::get('/', [\App\Http\Controllers\Agricultor\VentasController::class, 'index'])
+                    ->name('index');
+               Route::get('/exportar', [\App\Http\Controllers\Agricultor\VentasController::class, 'exportar'])
+                    ->name('exportar');
+               });
 
              Route::get('/resenas', [ResenasController::class, 'index'])
               ->name('resenas.index');
