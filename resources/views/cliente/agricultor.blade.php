@@ -17,7 +17,7 @@
             @else
                 <div class="w-full h-full bg-gradient-to-r from-green-400 to-green-600"></div>
             @endif
-        </div>
+        </div> <br> <br> <br>
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-16 pb-6 flex items-end">
             {{-- Avatar --}}
             <div class="flex-shrink-0">
