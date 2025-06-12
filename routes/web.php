@@ -98,11 +98,7 @@ Route::middleware(['role:cliente'])
          Route::patch('/perfil/password', [\App\Http\Controllers\Cliente\PerfilController::class, 'updatePassword'])
               ->name('perfil.updatePassword');
 
-         // Placeholders para futuras rutas
-         Route::get('/checkout', function () {
-             return 'Checkout - Por implementar';
-         })->name('checkout');
-
+         
          Route::get('/pedidos', [PedidoController::class, 'index'])
              ->name('pedidos');
 
@@ -141,6 +137,7 @@ Route::middleware(['role:cliente'])
                ->name('checkout.procesar');
           Route::get('/pedido/{id}/confirmacion', [\App\Http\Controllers\Cliente\CheckoutController::class, 'confirmacion'])
                ->name('pedido.confirmacion');
+               
 
           // Actualizar carrito para usar sesiones
           Route::post('/carrito/agregar', [\App\Http\Controllers\Cliente\CarritoController::class, 'agregar'])

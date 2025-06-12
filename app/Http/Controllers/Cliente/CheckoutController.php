@@ -9,6 +9,8 @@ use App\Models\Producto;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\PedidoConfirmado;
 
 class CheckoutController extends Controller
 {
@@ -45,37 +47,46 @@ class CheckoutController extends Controller
      */
     public function procesar(Request $request)
     {
-        // Validación de datos
+        // Validación de datos (mejorada para evitar errores regex)
         $validated = $request->validate([
             // Datos de envío
             'direccion_envio' => 'required|string|max:255',
-            'codigo_postal' => 'required|regex:/^[0-9]{5}$/',
+            'codigo_postal' => 'required|digits:5', // Cambiado regex por digits
             'municipio' => 'required|string|max:100',
             'provincia' => 'required|string|max:100',
-            'telefono_contacto' => 'required|regex:/^[0-9]{9,}$/',
+            'telefono_contacto' => 'required|digits_between:9,15', // Cambiado regex
             
             // Método de entrega
             'metodo_entrega' => 'required|in:recogida,domicilio',
             'fecha_entrega' => 'required|date|after_or_equal:today',
             'hora_entrega' => 'required|string',
             
-            // Datos de pago
+            // Datos de pago - sin validaciones específicas
             'metodo_pago' => 'required|in:tarjeta,efectivo',
-            'numero_tarjeta' => 'required_if:metodo_pago,tarjeta|nullable|regex:/^[0-9]{16}$/',
-            'nombre_titular' => 'required_if:metodo_pago,tarjeta|nullable|string|max:100',
-            'mes_expiracion' => 'required_if:metodo_pago,tarjeta|nullable|regex:/^(0[1-9]|1[0-2])$/',
-            'anio_expiracion' => 'required_if:metodo_pago,tarjeta|nullable|regex:/^[0-9]{2}$/',
-            'cvv' => 'required_if:metodo_pago,tarjeta|nullable|regex:/^[0-9]{3,4}$/',
+            'numero_tarjeta' => 'required_if:metodo_pago,tarjeta|nullable|string',
+            'nombre_titular' => 'required_if:metodo_pago,tarjeta|nullable|string',
+            'mes_expiracion' => 'required_if:metodo_pago,tarjeta|nullable|string',
+            'anio_expiracion' => 'required_if:metodo_pago,tarjeta|nullable|string',
+            'cvv' => 'required_if:metodo_pago,tarjeta|nullable|string',
             
             // Notas opcionales
             'notas_cliente' => 'nullable|string|max:500',
         ], [
             'direccion_envio.required' => 'La dirección de envío es obligatoria',
-            'codigo_postal.regex' => 'El código postal debe tener 5 dígitos',
-            'telefono_contacto.regex' => 'El teléfono debe tener al menos 9 dígitos',
+            'codigo_postal.digits' => 'El código postal debe tener exactamente 5 dígitos',
+            'municipio.required' => 'El municipio es obligatorio',
+            'provincia.required' => 'La provincia es obligatoria',
+            'telefono_contacto.digits_between' => 'El teléfono debe tener entre 9 y 15 dígitos',
+            'metodo_entrega.required' => 'Selecciona un método de entrega',
+            'fecha_entrega.required' => 'La fecha de entrega es obligatoria',
             'fecha_entrega.after_or_equal' => 'La fecha de entrega debe ser hoy o posterior',
-            'numero_tarjeta.regex' => 'El número de tarjeta debe tener 16 dígitos',
-            'cvv.regex' => 'El CVV debe tener 3 o 4 dígitos',
+            'hora_entrega.required' => 'La hora de entrega es obligatoria',
+            'metodo_pago.required' => 'Selecciona un método de pago',
+            'numero_tarjeta.required_if' => 'El número de tarjeta es obligatorio',
+            'nombre_titular.required_if' => 'El nombre del titular es obligatorio',
+            'mes_expiracion.required_if' => 'El mes de expiración es obligatorio',
+            'anio_expiracion.required_if' => 'El año de expiración es obligatorio',
+            'cvv.required_if' => 'El código CVV es obligatorio',
         ]);
 
         // Obtener carrito
@@ -94,7 +105,7 @@ class CheckoutController extends Controller
                 ->with('error', 'Algunos productos ya no están disponibles');
         }
 
-        // Procesar pago (simulación)
+        // Procesar pago (simulación mejorada)
         $pagoAprobado = $this->procesarPago($validated);
         
         if (!$pagoAprobado) {
@@ -137,14 +148,14 @@ class CheckoutController extends Controller
 
             DB::commit();
 
+            // Enviar correo de confirmación
+            $this->enviarCorreoConfirmacion($pedido, $productosValidados['items']);
+
             // Limpiar carrito
             session()->forget('carrito');
 
-            // Enviar notificaciones (aquí podrías enviar emails)
-            // $this->enviarNotificaciones($pedido);
-
             return redirect()->route('cliente.pedido.confirmacion', $pedido->id_pedido)
-                ->with('success', '¡Pedido realizado con éxito!');
+                ->with('success', '¡Pedido realizado con éxito! Recibirás un correo de confirmación.');
 
         } catch (\Exception $e) {
             DB::rollBack();
@@ -200,21 +211,23 @@ class CheckoutController extends Controller
     }
 
     /**
-     * Simula el procesamiento del pago
+     * Simula el procesamiento del pago (mejorado)
      */
     private function procesarPago($datos)
     {
-        // En producción, aquí integrarías con una pasarela de pago real
-        // Por ahora, simulamos que el pago es exitoso si:
-        // - El método es efectivo, o
-        // - La tarjeta no termina en 0000
+        // Simulación: tanto efectivo como tarjeta son exitosos
+        // Solo fallaría si la tarjeta termina en 0000 (para pruebas)
         
         if ($datos['metodo_pago'] === 'efectivo') {
             return true;
         }
 
-        // Simulación simple: rechazar si la tarjeta termina en 0000
-        return !str_ends_with($datos['numero_tarjeta'], '0000');
+        // Para tarjeta: simulamos éxito excepto si termina en 0000
+        if (isset($datos['numero_tarjeta'])) {
+            return !str_ends_with($datos['numero_tarjeta'], '0000');
+        }
+
+        return true; // Por defecto es exitoso
     }
 
     /**
@@ -234,5 +247,29 @@ class CheckoutController extends Controller
     private function generarNumeroTransaccion()
     {
         return 'TRX-' . date('YmdHis') . '-' . strtoupper(substr(md5(uniqid()), 0, 6));
+    }
+
+    /**
+     * Envía el correo de confirmación del pedido
+     */
+    private function enviarCorreoConfirmacion($pedido, $productosCarrito)
+    {
+        try {
+            $usuario = Auth::user();
+            
+            // Datos para el correo
+            $datosCorreo = [
+                'pedido_id' => $pedido->id_pedido,
+                'cliente_nombre' => $usuario->nombre . ' ' . $usuario->apellido,
+                'productos' => $productosCarrito,
+                'total' => $pedido->total,
+                'fecha' => $pedido->fecha_pedido->format('d/m/Y H:i')
+            ];
+
+            Mail::to($usuario->correo)->send(new PedidoConfirmado($datosCorreo));
+        } catch (\Exception $e) {
+            // Log del error pero no interrumpir el proceso
+            \Log::error('Error enviando correo de confirmación: ' . $e->getMessage());
+        }
     }
 }
