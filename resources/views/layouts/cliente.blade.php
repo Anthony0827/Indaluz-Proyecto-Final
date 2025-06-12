@@ -99,10 +99,7 @@
                                 <i data-lucide="package" class="w-4 h-4 inline mr-2"></i>
                                 Mis Pedidos
                             </a>
-                            <a href="{{ route('cliente.direcciones') }}" class="block px-4 py-2 text-gray-700 hover:bg-green-50">
-                                <i data-lucide="map-pin" class="w-4 h-4 inline mr-2"></i>
-                                Direcciones
-                            </a>
+                            
                             <hr class="my-2">
                             <form method="POST" action="{{ route('logout') }}">
                                 @csrf
