@@ -1,61 +1,194 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Indaluz 🌱
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+**Marketplace digital de productos agrícolas de proximidad** que conecta de forma directa a productores locales (agricultores) con consumidores finales, eliminando intermediarios.
 
-## About Laravel
+Indaluz funciona como un e-commerce especializado en frutas y verduras frescas y de temporada: los agricultores publican y gestionan su catálogo, controlan su inventario y atienden pedidos, mientras los clientes compran online, eligen recogida o entrega a domicilio y valoran el servicio mediante reseñas. La plataforma busca dar mejores márgenes al agricultor, precios competitivos al consumidor y contribuir a reducir el desperdicio alimentario fomentando el consumo local.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+> Proyecto Final de Ciclo — Anthony Ramos de León · I.E.S. Al-Ándalus · Curso 2024/2025
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+---
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## ✨ Funcionalidades principales
 
-## Learning Laravel
+La aplicación se organiza en torno a tres roles de usuario:
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+### 👤 Cliente
+- Registro con verificación de correo electrónico.
+- Catálogo de productos con búsqueda y filtrado por categoría.
+- Ficha de producto con detalle, agricultor vendedor y selección de cantidad.
+- Carrito de compras con validación de stock en tiempo real.
+- Proceso de checkout: datos de envío, método de pago (tarjeta/efectivo) y método de entrega (recogida/domicilio).
+- Historial de pedidos y seguimiento de estados.
+- Reseñas y valoraciones de agricultores sobre pedidos entregados.
+- Gestión del perfil personal (datos, avatar y contraseña).
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+### 🚜 Agricultor
+- Dashboard con resumen de actividad.
+- Gestión completa de productos (CRUD, reactivar y actualizar stock).
+- Gestión de pedidos: ver detalle, actualizar estado, marcar como preparado y exportar.
+- Módulo de ventas con métricas y exportación.
+- Visualización de reseñas recibidas de los clientes.
+- Perfil público de empresa (descripción, experiencia, certificaciones, métodos de cultivo, horario, foto de perfil y portada) con vista previa.
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### 🛠️ Administrador
+- Rol contemplado en el sistema (dashboard en desarrollo) para supervisión de usuarios, moderación de contenido y gestión de reportes/disputas.
 
-## Laravel Sponsors
+### 🌐 Páginas públicas
+- Inicio, Nosotros, Sostenibilidad, Agricultores y Contacto (con formulario de envío a soporte).
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+---
 
-### Premium Partners
+## 🧱 Stack tecnológico
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+| Capa | Tecnología |
+|------|------------|
+| Backend | [Laravel 12](https://laravel.com) (PHP ^8.2) — patrón MVC |
+| ORM | Eloquent |
+| Base de datos | MySQL / MariaDB |
+| Motor de plantillas | Blade |
+| Frontend | HTML5, CSS3, JavaScript vanilla |
+| Estilos | [Tailwind CSS 4](https://tailwindcss.com) |
+| Build / assets | [Vite 6](https://vitejs.dev) |
+| Gestor de dependencias PHP | Composer |
+| Entorno local | XAMPP (Apache + MySQL + PHP) |
 
-## Contributing
+---
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+## 🗂️ Arquitectura
 
-## Code of Conduct
+La lógica de negocio se organiza por módulos en namespaces específicos para cada rol:
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+```
+app/Http/Controllers/
+├── Auth/          → Registro, login y verificación de correo
+├── Cliente/       → Catálogo, carrito, checkout, pedidos, reseñas y perfil
+├── Agricultor/    → Productos, pedidos, ventas, reseñas y perfil
+└── HomeController → Páginas públicas y formulario de contacto
+```
 
-## Security Vulnerabilities
+- **Capa de presentación:** Blade + Tailwind CSS, con un *layout* maestro propio por cada rol (`resources/views/layouts/`).
+- **Capa de lógica de negocio:** controladores agrupados por rol.
+- **Capa de datos:** modelos Eloquent (`Usuario`, `Producto`, `Pedido`, `DetallePedido`, `Reseña`, `Verificacion`).
+- **Control de acceso:** middleware personalizado `CheckRole` que protege las rutas según el rol (`role:cliente`, `role:agricultor`, `role:administrador`).
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+### 🔐 Seguridad
+- Verificación de correo obligatoria antes del primer acceso.
+- Tokens CSRF en todos los formularios.
+- Contraseñas hasheadas con bcrypt; campos sensibles ocultos en el modelo (`$hidden`).
+- Validación y sanitización de inputs en servidor; consultas preparadas vía Eloquent (prevención de inyección SQL).
+- Validación de tipo MIME y límites de tamaño en la subida de imágenes.
+- Validación de stock en tiempo real y uso de transacciones en operaciones críticas (creación de pedidos).
+- Simulación del procesamiento de pagos sin almacenar datos de tarjeta.
 
-## License
+---
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+## 🗄️ Base de datos
+
+Base de datos `indaluz` (MySQL/MariaDB), normalizada hasta 3FN. El esquema completo está en [`database/indaluz.sql`](database/indaluz.sql).
+
+| Tabla | Descripción |
+|-------|-------------|
+| `usuarios` | Tabla polimórfica de todos los usuarios diferenciados por el campo `rol` (administrador, cliente, agricultor). Incluye campos específicos de agricultor (empresa, certificaciones, métodos de cultivo, etc.). |
+| `productos` | Catálogo vinculado al agricultor (`id_agricultor`). Categoría (fruta/verdura), unidad de medida, inventario y tiempo de cosecha. |
+| `pedidos` | Pedidos de los clientes con estado, método de pago/entrega y datos de envío. |
+| `detalle_pedido` | Líneas de pedido (*Order-LineItem*); guarda el precio histórico unitario. |
+| `reseñas` | Valoraciones cliente–agricultor–pedido (solo sobre transacciones completadas). |
+| `reportes` | Reportes de clientes/agricultores sobre productos o pedidos para moderación del administrador. |
+| `verificaciones` | Tokens de verificación de correo electrónico. |
+| `password_resets` | Tokens de recuperación de contraseña. |
+
+> Nota: el esquema de tablas vive en el dump SQL (las migraciones de Laravel del repositorio son stubs). Importa `database/indaluz.sql` para crear la estructura.
+
+---
+
+## 🚀 Instalación y puesta en marcha
+
+### Requisitos previos
+- PHP ≥ 8.2
+- Composer
+- Node.js y npm
+- MySQL / MariaDB (p. ej. mediante **XAMPP**)
+
+### Pasos
+
+1. **Clonar el repositorio**
+   ```bash
+   git clone git@github.com:Anthony0827/Indaluz-Proyecto-Final.git
+   cd Indaluz-Proyecto-Final
+   ```
+
+2. **Instalar dependencias**
+   ```bash
+   composer install
+   npm install
+   ```
+
+3. **Configurar el entorno**
+   ```bash
+   cp .env.example .env
+   php artisan key:generate
+   ```
+
+4. **Crear e importar la base de datos**
+
+   Crea una base de datos llamada `indaluz` (por ejemplo desde phpMyAdmin) e importa el esquema:
+   ```bash
+   mysql -u root indaluz < database/indaluz.sql
+   ```
+
+5. **Configurar la conexión en `.env`**
+   ```env
+   DB_CONNECTION=mysql
+   DB_HOST=127.0.0.1
+   DB_PORT=3306
+   DB_DATABASE=indaluz
+   DB_USERNAME=root
+   DB_PASSWORD=
+   ```
+
+6. **Enlazar el almacenamiento público** (para las imágenes subidas)
+   ```bash
+   php artisan storage:link
+   ```
+
+7. **Compilar assets y arrancar**
+   ```bash
+   npm run dev          # compila assets (Vite) en modo desarrollo
+   php artisan serve    # servidor de desarrollo en http://localhost:8000
+   ```
+
+   > Alternativamente, sirve el proyecto directamente con Apache de XAMPP apuntando a la carpeta `public/`.
+
+---
+
+## 📁 Estructura del proyecto
+
+```
+Indaluz-Proyecto-Final/
+├── app/
+│   ├── Http/Controllers/   # Controladores por rol (Auth, Cliente, Agricultor)
+│   ├── Http/Middleware/     # CheckRole
+│   ├── Mail/                # Correos (verificación, confirmación de pedido)
+│   └── Models/              # Modelos Eloquent
+├── database/
+│   ├── indaluz.sql          # Esquema completo de la base de datos
+│   ├── factories/
+│   ├── migrations/
+│   └── seeders/
+├── resources/views/         # Vistas Blade (públicas, cliente, agricultor, auth, emails)
+├── routes/web.php           # Definición de rutas
+├── public/                  # Punto de entrada y assets compilados
+└── ...
+```
+
+---
+
+## 👤 Autor
+
+**Anthony Ramos de León** — Proyecto Final de Ciclo, I.E.S. Al-Ándalus (Curso 2024/2025).
+
+---
+
+## 📄 Licencia
+
+Proyecto desarrollado sobre el framework Laravel, software de código abierto bajo licencia [MIT](https://opensource.org/licenses/MIT).
