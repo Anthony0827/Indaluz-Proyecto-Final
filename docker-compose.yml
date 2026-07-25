@@ -1,0 +1,50 @@
+# ══════════════════════════════════════════════════════════════════
+# Indaluz — Laravel 12 + MariaDB, en modo demo (auto-restauración).
+# Detrás del reverse proxy Caddy (red externa "web"). Sin puertos al host.
+# ══════════════════════════════════════════════════════════════════
+services:
+  app:
+    build:
+      context: .
+      args:
+        PHP_VERSION: "8.3"
+    image: indaluz-app
+    container_name: indaluz-app
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - default   # alcanza a la BD
+      - web       # para que Caddy lo alcance
+
+  db:
+    image: mariadb:11
+    container_name: indaluz-db
+    restart: unless-stopped
+    environment:
+      MARIADB_DATABASE: indaluz
+      MARIADB_USER: indaluz
+      # Contraseñas fuera del repo: se leen de un fichero .env (gitignoreado)
+      MARIADB_PASSWORD: ${DB_PASSWORD:?define DB_PASSWORD en .env}
+      MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:?define DB_ROOT_PASSWORD en .env}
+    volumes:
+      - indaluz_db:/var/lib/mysql
+      # Carga automática en el PRIMER arranque (volumen vacío):
+      - ./database/indaluz.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+      - ./database/demo_seed.sql:/docker-entrypoint-initdb.d/02-seed.sql:ro
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks:
+      - default
+
+volumes:
+  indaluz_db:
+
+networks:
+  web:
+    external: true
+  default:
