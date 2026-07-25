@@ -11,6 +11,12 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
+        // Detrás del reverse proxy Caddy (HTTPS terminado en el proxy)
+        $middleware->trustProxies(at: '*');
+        // Bloquea acciones sensibles en el demo (cambio de contraseña)
+        $middleware->web(append: [
+            \App\Http\Middleware\DemoGuard::class,
+        ]);
         // Registrar el middleware de rol aquí
         $middleware->alias([
             'role' => \App\Http\Middleware\CheckRole::class,

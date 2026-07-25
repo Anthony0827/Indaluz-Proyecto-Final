@@ -50,6 +50,13 @@ class Usuario extends Authenticatable
         return $this->contraseña;
     }
 
+    // Nombre real de la columna de contraseña (evita que el rehash
+    // automático de Laravel intente escribir en una columna 'password').
+    public function getAuthPasswordName()
+    {
+        return 'contraseña';
+    }
+
     /**
      * Relación con productos (para agricultores)
      */
