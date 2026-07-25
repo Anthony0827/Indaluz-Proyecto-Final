@@ -189,22 +189,22 @@
 </section>
 
 <!-- PROGRAMA ANTI-DESPERDICIO -->
-<section class="bg-gradient-to-r from-green-600 to-green-700 text-white py-12 rounded-xl mb-16">
+<section class="bg-gradient-to-r from-green-600 to-green-700 text-white py-12 rounded-xl mb-16" style="background: linear-gradient(to right, #16a34a, #15803d); color: #ffffff;">
     <div class="max-w-4xl mx-auto text-center px-6">
         <h2 class="text-3xl font-bold mb-6">Programa Anti-Desperdicio</h2>
         <p class="text-lg mb-8">
             Productos próximos a su fecha de vencimiento a precios reducidos. ¡Únete a la lucha contra el desperdicio alimentario!
         </p>
         <div class="grid md:grid-cols-3 gap-6 mb-8">
-            <div class="bg-white bg-opacity-20 p-4 rounded-lg">
+            <div class="bg-white bg-opacity-20 p-4 rounded-lg" style="background: rgba(255,255,255,0.18); color: #ffffff;">
                 <div class="text-3xl font-bold mb-2">2.5 Ton</div>
                 <div class="text-sm">Alimentos salvados</div>
             </div>
-            <div class="bg-white bg-opacity-20 p-4 rounded-lg">
+            <div class="bg-white bg-opacity-20 p-4 rounded-lg" style="background: rgba(255,255,255,0.18); color: #ffffff;">
                 <div class="text-3xl font-bold mb-2">1,200</div>
                 <div class="text-sm">Familias beneficiadas</div>
             </div>
-            <div class="bg-white bg-opacity-20 p-4 rounded-lg">
+            <div class="bg-white bg-opacity-20 p-4 rounded-lg" style="background: rgba(255,255,255,0.18); color: #ffffff;">
                 <div class="text-3xl font-bold mb-2">80%</div>
                 <div class="text-sm">Descuento promedio</div>
             </div>
