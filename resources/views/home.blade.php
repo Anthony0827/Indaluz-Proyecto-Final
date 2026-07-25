@@ -6,7 +6,7 @@
 
 <!-- HERO -->
 <section class="relative w-full h-96 bg-cover bg-center rounded-xl overflow-hidden mb-12" style="background-image: url('/images/frutas-header.jpg')">
-    <div class="absolute inset-0 bg-green-900 bg-opacity-50 flex items-center justify-center text-center text-white px-6">
+    <div class="absolute inset-0 bg-green-900/50 flex items-center justify-center text-center text-white px-6">
         <div>
             <h1 class="text-4xl md:text-5xl font-bold mb-4">Frescura directa desde el campo</h1>
             <p class="mb-6 text-lg">Conecta con agricultores locales y disfruta productos frescos, sostenibles y saludables.</p>
@@ -70,9 +70,9 @@
     <div>
         <h4 class="text-xl font-bold mb-4">Síguenos en redes</h4>
         <div class="flex gap-4 mb-4 text-green-600">
-            <i data-lucide="facebook" class="w-6 h-6"></i>
-            <i data-lucide="instagram" class="w-6 h-6"></i>
-            <i data-lucide="twitter" class="w-6 h-6"></i>
+            <x-icono-social red="facebook" class="w-6 h-6" />
+            <x-icono-social red="instagram" class="w-6 h-6" />
+            <x-icono-social red="twitter" class="w-6 h-6" />
         </div>
         <p class="text-sm">Email: <a href="mailto:contacto@indaluz.com" class="text-green-700 font-medium">contacto@indaluz.com</a></p>
         <p class="text-sm">Tel: +34 123 456 789</p>

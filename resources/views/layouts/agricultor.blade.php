@@ -126,7 +126,7 @@
                 </div>
 
                 <!-- Overlay -->
-                <div @click="open = false" class="flex-shrink-0 w-14 bg-black bg-opacity-50"></div>
+                <div @click="open = false" class="flex-shrink-0 w-14 bg-black/50"></div>
             </div>
         </div>
 

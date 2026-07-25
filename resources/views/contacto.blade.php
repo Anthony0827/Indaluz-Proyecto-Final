@@ -6,7 +6,7 @@
 
 <!-- HERO CONTACTO -->
 <section class="relative w-full h-64 bg-cover bg-center rounded-xl overflow-hidden mb-12" style="background-image: url('/images/almeria-paisaje.jpg')">
-    <div class="absolute inset-0 bg-green-900 bg-opacity-60 flex items-center justify-center text-center text-white px-6">
+    <div class="absolute inset-0 bg-green-900/60 flex items-center justify-center text-center text-white px-6">
         <div>
             <h1 class="text-4xl md:text-5xl font-bold mb-4">Contacta con Nosotros</h1>
             <p class="text-lg">Estamos aquí para ayudarte con cualquier consulta</p>
@@ -324,45 +324,45 @@
         <div class="flex justify-center space-x-6 mb-8">
             <!-- Facebook -->
             <a href="#" class="bg-green-600 text-white p-4 rounded-full hover:bg-green-700 transition">
-                <i data-lucide="facebook" class="w-6 h-6"></i>
+                <x-icono-social red="facebook" class="w-6 h-6" />
             </a>
             
             <!-- Instagram -->
             <a href="#" class="bg-green-600 text-white p-4 rounded-full hover:bg-green-700 transition">
-                <i data-lucide="instagram" class="w-6 h-6"></i>
+                <x-icono-social red="instagram" class="w-6 h-6" />
             </a>
             
             <!-- Twitter -->
             <a href="#" class="bg-green-600 text-white p-4 rounded-full hover:bg-green-700 transition">
-                <i data-lucide="twitter" class="w-6 h-6"></i>
+                <x-icono-social red="twitter" class="w-6 h-6" />
             </a>
             
             <!-- LinkedIn -->
             <a href="#" class="bg-green-600 text-white p-4 rounded-full hover:bg-green-700 transition">
-                <i data-lucide="linkedin" class="w-6 h-6"></i>
+                <x-icono-social red="linkedin" class="w-6 h-6" />
             </a>
             
             <!-- YouTube -->
             <a href="#" class="bg-green-600 text-white p-4 rounded-full hover:bg-green-700 transition">
-                <i data-lucide="youtube" class="w-6 h-6"></i>
+                <x-icono-social red="youtube" class="w-6 h-6" />
             </a>
         </div>
 
         <div class="grid md:grid-cols-3 gap-6 text-sm">
             <div class="bg-white p-4 rounded-xl shadow-sm">
-                <i data-lucide="facebook" class="w-8 h-8 text-green-600 mx-auto mb-2"></i>
+                <x-icono-social red="facebook" class="w-8 h-8 text-green-600 mx-auto mb-2" />
                 <p class="font-medium text-gray-800">@IndaluzAlmeria</p>
                 <p class="text-gray-600">Noticias y actualizaciones diarias</p>
             </div>
             
             <div class="bg-white p-4 rounded-xl shadow-sm">
-                <i data-lucide="instagram" class="w-8 h-8 text-green-600 mx-auto mb-2"></i>
+                <x-icono-social red="instagram" class="w-8 h-8 text-green-600 mx-auto mb-2" />
                 <p class="font-medium text-gray-800">@indaluz_oficial</p>
                 <p class="text-gray-600">Fotos de productos y recetas</p>
             </div>
             
             <div class="bg-white p-4 rounded-xl shadow-sm">
-                <i data-lucide="youtube" class="w-8 h-8 text-green-600 mx-auto mb-2"></i>
+                <x-icono-social red="youtube" class="w-8 h-8 text-green-600 mx-auto mb-2" />
                 <p class="font-medium text-gray-800">Indaluz TV</p>
                 <p class="text-gray-600">Tutoriales y documentales</p>
             </div>

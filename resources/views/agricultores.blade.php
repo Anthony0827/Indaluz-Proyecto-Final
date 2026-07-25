@@ -6,7 +6,7 @@
 
 <!-- HERO AGRICULTORES -->
 <section class="relative w-full h-80 bg-cover bg-center rounded-xl overflow-hidden mb-12" style="background-image: url('/images/agricultor-campo.jpg')">
-    <div class="absolute inset-0 bg-green-900 bg-opacity-60 flex items-center justify-center text-center text-white px-6">
+    <div class="absolute inset-0 bg-green-900/60 flex items-center justify-center text-center text-white px-6">
         <div>
             <h1 class="text-4xl md:text-5xl font-bold mb-4">Vende Directamente</h1>
             <p class="text-lg max-w-3xl">Conecta con miles de consumidores y obtén mejores precios por tus productos</p>
@@ -269,14 +269,14 @@
             Sin costes ocultos ni suscripciones mensuales. Solo pagas una pequeña comisión por venta realizada.
         </p>
         <div class="grid md:grid-cols-2 gap-8 mb-8">
-            <div class="bg-white bg-opacity-20 p-6 rounded-xl">
+            <div class="bg-white/20 p-6 rounded-xl">
                 <h3 class="text-2xl font-bold mb-2">5%</h3>
                 <p class="text-lg font-semibold mb-2">Comisión por Venta</p>
                 <p class="text-sm">
                     Solo pagas cuando vendes. Sin cuotas mensuales ni costes de mantenimiento.
                 </p>
             </div>
-            <div class="bg-white bg-opacity-20 p-6 rounded-xl">
+            <div class="bg-white/20 p-6 rounded-xl">
                 <h3 class="text-2xl font-bold mb-2">0€</h3>
                 <p class="text-lg font-semibold mb-2">Registro y Alta</p>
                 <p class="text-sm">
@@ -284,7 +284,7 @@
                 </p>
             </div>
         </div>
-        <div class="bg-white bg-opacity-10 p-4 rounded-lg mb-6">
+        <div class="bg-white/10 p-4 rounded-lg mb-6">
             <p class="text-sm">
                 <strong>Ejemplo:</strong> Si vendes productos por valor de 100€, pagas solo 5€ de comisión. El 95% restante es para ti.
             </p>

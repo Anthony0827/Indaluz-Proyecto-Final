@@ -6,7 +6,7 @@
 
 <!-- HERO NOSOTROS -->
 <section class="relative w-full h-80 bg-cover bg-center rounded-xl overflow-hidden mb-12" style="background-image: url('/images/equipo-indaluz.jpg')">
-    <div class="absolute inset-0 bg-green-800 bg-opacity-60 flex items-center justify-center text-center text-white px-6">
+    <div class="absolute inset-0 bg-green-800/60 flex items-center justify-center text-center text-white px-6">
         <div>
             <h1 class="text-4xl md:text-5xl font-bold mb-4">Conoce Indaluz</h1>
             <p class="text-lg max-w-2xl">Nuestra historia, valores y compromiso con la agricultura andaluza</p>
