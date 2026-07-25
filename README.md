@@ -8,6 +8,17 @@ Indaluz funciona como un e-commerce especializado en frutas y verduras frescas y
 
 ---
 
+## Pruébalo en vivo
+
+**[indaluz.anthonyramos.duckdns.org](https://indaluz.anthonyramos.duckdns.org)**
+
+Demo pública desplegada con Docker en una VPS propia. Hay una cuenta de
+cliente y otra de agricultor —merece la pena ver las dos, porque la tienda
+cambia bastante según el rol—; ambas aparecen en la pantalla de login. Los
+datos se restauran solos cada 15 minutos.
+
+---
+
 ## ✨ Funcionalidades principales
 
 La aplicación se organiza en torno a tres roles de usuario:
